@@ -1,0 +1,548 @@
+/* GridQueue UI. Colours come ONLY from tokens.css (var(--…)); tints are color-mix() of those tokens.
+   Small/secondary text uses --color-text-secondary: --color-text-muted on --color-bg-card is ~3.2:1, below AA. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-grid-blue);
+  word-break: break-all;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-grid-blue);
+  outline-offset: 2px;
+}
+
+.shell {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ------------------------------------------------------------------ masthead */
+
+.masthead p {
+  margin: 4px 0 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.brand__mark {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  background: var(--color-grid-blue);
+  box-shadow: 6px 6px 0 -2px var(--color-available);
+}
+
+/* ------------------------------------------------------------------ primitives */
+
+.card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.muted {
+  color: var(--color-text-secondary);
+}
+
+.small {
+  font-size: 13px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn:disabled {
+  cursor: progress;
+  opacity: 0.75;
+}
+
+.btn--primary {
+  background: var(--color-grid-blue);
+  color: var(--color-bg-primary);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn--ghost:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------------------ form */
+
+.query {
+  display: grid;
+  grid-template-columns: 1fr 140px;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  min-width: 0;
+}
+
+.field input:not([type="radio"]) {
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 16px;
+  padding: 10px 12px;
+}
+
+.segmented {
+  grid-column: 1 / -1;
+  border: 0;
+  padding: 0;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.segmented legend {
+  padding: 0;
+  margin-bottom: 6px;
+  width: 100%;
+}
+
+.segmented label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.segmented label.is-active {
+  border-color: var(--color-grid-blue);
+  background: color-mix(in srgb, var(--color-grid-blue) 16%, transparent);
+}
+
+.segmented input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.segmented label:has(input:focus-visible) {
+  outline: 2px solid var(--color-grid-blue);
+  outline-offset: 2px;
+}
+
+.query__actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ------------------------------------------------------------------ results */
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px dashed var(--color-congested);
+  background: color-mix(in srgb, var(--color-congested) 10%, transparent);
+  color: var(--color-text-primary);
+  font-size: 14px;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  border-color: var(--color-critical);
+}
+
+/* Direction card — tone drives the left rule and the status chip, never meaning on its own. */
+.direction-card {
+  border-left: 4px solid var(--color-text-muted);
+}
+
+.tone--available {
+  border-left-color: var(--color-available);
+}
+.tone--congested {
+  border-left-color: var(--color-congested);
+}
+.tone--critical {
+  border-left-color: var(--color-critical);
+}
+
+.direction-card__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.verdict-badge {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0 10px;
+}
+
+.verdict-badge__date {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.verdict-badge__sep {
+  font-size: 28px;
+  color: var(--color-text-secondary);
+}
+
+.verdict-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.headline {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.status--available {
+  border-color: var(--color-available);
+  background: color-mix(in srgb, var(--color-available) 14%, transparent);
+}
+.status--congested {
+  border-color: var(--color-congested);
+  background: color-mix(in srgb, var(--color-congested) 14%, transparent);
+}
+.status--critical {
+  border-color: var(--color-critical);
+  background: color-mix(in srgb, var(--color-critical) 14%, transparent);
+}
+.status--neutral {
+  background: var(--color-bg-secondary);
+}
+
+/* Binding chip — distinguishable without colour: icon + border style + label. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  border: 2px solid var(--color-text-secondary);
+}
+
+.chip--solid {
+  border-style: solid;
+  border-color: var(--color-available);
+}
+.chip--dashed {
+  border-style: dashed;
+  border-color: var(--color-congested);
+}
+.chip--dotted {
+  border-style: dotted;
+}
+
+.marker {
+  display: inline-block;
+  margin: 0 4px 4px 0;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--color-bg-secondary);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* Quote pill */
+.quote-pill {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-secondary);
+}
+
+.quote-pill summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  list-style: none;
+}
+
+.quote-pill summary::-webkit-details-marker {
+  display: none;
+}
+
+.quote-pill summary::after {
+  content: "+";
+  margin-left: auto;
+  color: var(--color-text-secondary);
+}
+
+.quote-pill[open] summary::after {
+  content: "−";
+}
+
+.quote-pill blockquote,
+blockquote.script,
+blockquote.route {
+  margin: 0 14px 12px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--color-grid-blue);
+  color: var(--color-text-primary);
+  font-style: italic;
+}
+
+blockquote.script,
+blockquote.route {
+  margin: 10px 0;
+}
+
+.cite-meta {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 14px;
+  margin: 0 14px 14px;
+  font-size: 13px;
+}
+
+.cite-meta dt {
+  color: var(--color-text-secondary);
+}
+
+.cite-meta dd {
+  margin: 0;
+  min-width: 0;
+}
+
+/* No-position card */
+.no-position {
+  border-color: var(--color-text-muted);
+  border-style: dashed;
+}
+
+.no-position h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+}
+
+.plain-details summary {
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Options */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  margin: 0 0 12px;
+}
+
+.section-title .muted {
+  font-weight: 400;
+  font-size: 14px;
+}
+
+.options {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-card {
+  display: flex;
+  gap: 16px;
+}
+
+.option-card__rank {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  border: 2px solid var(--color-grid-blue);
+}
+
+.option-card__body {
+  min-width: 0;
+}
+
+.option-card h4 {
+  margin: 4px 0 8px;
+  font-size: 16px;
+}
+
+.option-card p {
+  margin: 0;
+}
+
+/* Gate report */
+.gate summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rejections {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.rejections li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  padding-left: 10px;
+  border-left: 2px solid var(--color-critical);
+}
+
+.rejections .reason {
+  color: var(--color-text-secondary);
+}
+
+.foot p {
+  margin: 0 0 6px;
+}
+
+@media (max-width: 560px) {
+  .query {
+    grid-template-columns: 1fr;
+  }
+  .verdict-badge__date {
+    font-size: 28px;
+  }
+}

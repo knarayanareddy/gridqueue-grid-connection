@@ -1,0 +1,31 @@
+{
+  "_synthetic": true,
+  "_note": "Hand-written stand-in for Nemotron Ultra output. Well-behaved: every quote is verbatim.",
+  "claims": [
+    {
+      "document_id": "liander_amsterdam",
+      "verbatim_quote": "Nieuwe aanvragen voor afname worden alleen onder voorwaarden toegekend.",
+      "page_or_row": null,
+      "congestion_registered": true,
+      "queue_status": "CONDITIONAL",
+      "indicative_earliest_date": null,
+      "binding": "unknown",
+      "binding_evidence_quote": null,
+      "available_capacity_kw": null,
+      "capacity_basis_quote": null,
+      "publication_date": null,
+      "publication_date_quote": null,
+      "confidence": 0.75
+    }
+  ],
+  "options": [
+    {
+      "kind": "congestion_management_participation",
+      "document_id": "liander_amsterdam",
+      "route_quote": "Wie op de wachtlijst staat, kan zich aanmelden voor congestiemanagement via het klantportaal.",
+      "estimated_kw_enabled": null,
+      "kw_quote": null,
+      "confidence": 0.6
+    }
+  ]
+}

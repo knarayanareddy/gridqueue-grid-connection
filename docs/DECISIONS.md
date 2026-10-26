@@ -54,3 +54,45 @@ show a broken badge. See docs/ci/README.md.
 **D-009 · Explicit ruff rule selection.**
 ruff 0.17 changed its default rule set. The rules are pinned in `backend/pyproject.toml` so `make check`
 doesn't change meaning with the installed version.
+
+## 2026-10-26 · C-T14-T19 (Tavily retrieval, `/v1/answer`, Direction Card)
+
+**D-010 · Live and fixture data are never mixed.**
+`/v1/answer` runs **live** only if `NEBIUS_API_KEY` and `TAVILY_API_KEY` are both set and
+`MOCK_EXTERNAL_CALLS` is false. Otherwise it runs on SYNTHETIC fixtures, with `retrieval.synthetic = true`, a
+disclaimer notice and a UI banner. If live retrieval fails, the answer abstains (`tavily_unavailable`) instead
+of falling back to fixtures. *Why:* a silent fallback would present invented documents as the operator's
+current position.
+
+**D-011 · The model proposes, code disposes.**
+Ultra returns *proposals* that must match a strict JSON schema. `s5_answer.py` keeps a value only when
+`DeterministicGate` finds it in the fetched text:
+- The claim quote must be verbatim. Otherwise the claim is rejected.
+- The document must distinguish feed-in from afname. Otherwise the claim is rejected (`direction_conflated`).
+- A date must be stated in the quote, **and** the document's publication date must be verified. Otherwise
+  the date is dropped.
+- A kW figure must appear in its own verbatim quote.
+- A binding statement must come with its own verbatim quote. Otherwise binding becomes `unknown`.
+- An explicit non-binding marker (lexicon §3) forces `non_binding`.
+- An option route must be verbatim **and** name the route kind.
+
+`llm_calls_in_gate` is always 0. Removing the gate makes the tests fail (checked by mutation).
+
+**D-012 · Search is restricted to the operator's domain, twice.**
+Tavily `include_domains` uses its default `restrict` mode. Each result URL is also re-checked client-side
+before extraction. At most 3 documents are kept, ranked by Tavily score. Rejected URLs and the reasons are
+returned in `retrieval.results_rejected`.
+
+**D-013 · One direction per request.**
+The ticket's API takes a single `direction`, so `per_direction` has exactly one entry. Asking both directions
+means two calls.
+
+**D-014 · Verdict and option ranking are deterministic tables.**
+- Congestion not registered → `CAPACITY_AVAILABLE`, or `PARTIAL_CAPACITY` when the stated kW is below the
+  request.
+- Congestion registered → `WAITLIST` gives `WAITLIST_ONLY`, `CONDITIONAL` gives `NON_FIRM_ONLY`, `CLOSED`
+  gives `NO_FIRM_CAPACITY`, anything else gives `UNDETERMINED`.
+- Registration unknown, or no surviving claim → `NO_OFFICIAL_POSITION_FOUND`, plus the lexicon §5 phone
+  script.
+- Options are ranked: stated kW ≥ request first, then stated kW descending, then a fixed kind order, then id.
+  No model confidence is used in ranking.

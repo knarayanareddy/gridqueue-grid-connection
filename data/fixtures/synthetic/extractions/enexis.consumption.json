@@ -1,0 +1,22 @@
+{
+  "_synthetic": true,
+  "_note": "Hand-written stand-in for Nemotron Ultra output. Well-behaved: every quote is verbatim.",
+  "claims": [
+    {
+      "document_id": "enexis_eindhoven",
+      "verbatim_quote": "Voor afname is in de regio Eindhoven geen congestie geregistreerd.",
+      "page_or_row": null,
+      "congestion_registered": false,
+      "queue_status": "OPEN",
+      "indicative_earliest_date": null,
+      "binding": "unknown",
+      "binding_evidence_quote": null,
+      "available_capacity_kw": 250,
+      "capacity_basis_quote": "Per nieuwe aansluiting is maximaal 250 kW afnamecapaciteit beschikbaar.",
+      "publication_date": "2026-07-14",
+      "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+      "confidence": 0.9
+    }
+  ],
+  "options": []
+}

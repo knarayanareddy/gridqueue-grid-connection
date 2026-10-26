@@ -1,0 +1,13 @@
+SYNTHETISCH TESTDOCUMENT — GEEN PUBLICATIE VAN LIANDER.
+Dit bestand is geschreven door het GridQueue-project om de pijplijn zonder netwerk te testen. Alle gebieden, cijfers en data zijn verzonnen.
+
+Congestieoverzicht regio Amsterdam (synthetisch voorbeeld)
+Peildatum: 1 oktober 2026.
+
+Teruglevering: in de regio Amsterdam is congestie op teruglevering geregistreerd. Aanvragen worden op de
+wachtlijst geplaatst. Er is nog geen indicatieve datum bekend waarop weer capaciteit beschikbaar komt.
+
+Afname: in de regio Amsterdam is congestie op afname geregistreerd. Nieuwe aanvragen voor afname worden
+alleen onder voorwaarden toegekend.
+
+Wie op de wachtlijst staat, kan zich aanmelden voor congestiemanagement via het klantportaal.
