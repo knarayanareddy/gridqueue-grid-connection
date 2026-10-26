@@ -1,28 +1,52 @@
 from fastapi import FastAPI
+
 from app.config import settings
 
+TITLE = "GridQueue — Energy Grid Interconnection Navigator & Flex Planner"
+
 app = FastAPI(
-    title="GridQueue — Energy Grid Interconnection Navigator & Flex Planner",
-    description="Navigate electrical grid congestion in the Netherlands and NW Europe — live DSO register and non-binding indicative forecast ('codeerprognose') discovery via Tavily, deterministic citation gating, and autonomous non-firm flexibility planning.",
-    version="0.1.0"
+    title=TITLE,
+    description=(
+        "Navigate electrical grid congestion in the Netherlands — direction-aware (feed-in vs consumption) "
+        "answers grounded in official grid-operator documents, a deterministic citation gate, and ranked "
+        "non-firm / flexibility options."
+    ),
+    version="0.1.0",
 )
 
+
 @app.get("/health")
-def health_check():
+def health_check() -> dict[str, str]:
     return {"status": "ok", "environment": settings.environment}
 
+
 @app.get("/v1/info")
-def get_info():
+def get_info() -> dict[str, object]:
     return {
-        "project": "GridQueue — Energy Grid Interconnection Navigator & Flex Planner",
+        "project": TITLE,
         "track": "Best Apps and Agents (Eligible for Best Use of Tavily $3,000)",
         "models": {
             "ultra": settings.model_ultra,
             "super": settings.model_super,
-            "nano": settings.model_nano
-        }
+            "nano": settings.model_nano,
+        },
+        "keys_configured": {
+            "nebius": settings.has_nebius_key,
+            "tavily": settings.has_tavily_key,
+        },
     }
 
-if __name__ == "__main__":
+
+def run() -> None:
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=settings.environment == "development",
+    )
+
+
+if __name__ == "__main__":
+    run()

@@ -1,1 +1,1 @@
-"""App root package."""\n
+"""GridQueue backend application package."""

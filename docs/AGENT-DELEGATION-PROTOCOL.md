@@ -34,7 +34,7 @@ PHASE:       2
 OWNER:       backend-agent
 DEPENDS_ON:  A-T03, A-T06            ← do not start until these are DONE
 BLOCKS:      A-T11, A-T14
-CONTEXT:     ideas/_shared/platform-capabilities.md#2-token-factory-inference
+CONTEXT:     docs/PLATFORM-CAPABILITIES.md#2-token-factory-inference
              ideas/A-redflag-eu-product-safety/schemas/core-schemas.json#ListingFields
              ideas/A-redflag-eu-product-safety/data/gpsr-rules.v0.json
 DELIVERABLE: backend/app/stages/extract_fields.py

@@ -2,7 +2,7 @@
 name = "gridqueue-grid-connection"
 version = "0.1.0"
 description = "GridQueue — Energy Grid Interconnection Navigator & Flex Planner"
-readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.110.0",
@@ -24,6 +24,35 @@ dev = [
     "mypy>=1.9.0"
 ]
 
+[project.scripts]
+gridqueue-api = "app.main:run"
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+[tool.ruff.lint]
+# Explicit selection so results don't change with ruff's default rule set between versions.
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B017"]
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["app"]
+strict_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+check_untyped_defs = true

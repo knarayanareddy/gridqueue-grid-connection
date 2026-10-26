@@ -4,7 +4,7 @@
 **Version:** 1.0 · 26 Oct 2026 · **Build window:** Sun 26 Oct → Thu 30 Oct 2026, 19:00 CEST
 **Role in the portfolio:** the **location-advantage** play. Zero competitors in energy/grid. Second pivot after Idea B.
 
-> Read `_shared/agent-delegation-protocol.md` before dispatching any ticket.
+> Read `docs/AGENT-DELEGATION-PROTOCOL.md` before dispatching any ticket.
 
 ---
 
@@ -380,7 +380,7 @@ harm this product prevents. Put that number in the first line of the README.
 
 ## 7. Repository layout
 
-As `_shared/platform-capabilities.md §7`, plus:
+As `docs/PLATFORM-CAPABILITIES.md §7`, plus:
 ```
 backend/app/stages/{s1_resolve_location.py … s6_plan_artifact.py}
 backend/app/gate/{gate.py,rules_loader.py,quote_check.py}
@@ -495,7 +495,7 @@ VERIFY: cd backend && uv run pytest tests/test_ledger.py tests/test_chunking.py 
 ```
 ID: C-T07  TITLE: Design system — "utility paperwork"
 PHASE: 0   OWNER: frontend-agent DEPENDS_ON: C-T01  BLOCKS: C-T13, C-T20
-CONTEXT: _shared/judging-rubric.md §3
+CONTEXT: docs/JUDGING-RUBRIC.md §3
 DELIVERABLE: frontend/src/tokens.css ; frontend/src/components/primitives.tsx ; docs/DESIGN.md
 SPEC: Metaphor = a grid operator's written determination letter, modernised. Palette: utility blue-grey #1B2A38,
       paper #F4F2ED, live-wire amber #F2A900 for "non-binding / indicative", a firm-capacity green #2C7A4B,
@@ -945,7 +945,7 @@ ACCEPTANCE: the demo returns a full, correctly-cited answer with all external pu
 ```
 ID: C-T37  TITLE: LIMITATIONS.md with real failure cases
 PHASE: 4  OWNER: content-agent DEPENDS_ON: C-T23, C-T33, C-T26, C-T27  BLOCKS: G5
-CONTEXT: _shared/templates/LIMITATIONS.template.md
+CONTEXT: docs/templates/LIMITATIONS.template.md
 SPEC: Real numbers and ≥4 concrete failure cases with screenshots. Must cover: coverage (which DSOs and areas are
       in the corpus and which are not, by name); that a codeerprognose is non-binding and moves, with the
       revision evidence; that the tool reports the *published official position*, not a prediction, and is not a
@@ -960,7 +960,7 @@ ACCEPTANCE: every claim backed by a number, citation or screenshot; a sceptical 
 ```
 ID: C-T38  TITLE: README.md complete
 PHASE: 4  OWNER: content-agent DEPENDS_ON: C-T25, C-T29, C-T23  BLOCKS: G5
-CONTEXT: _shared/templates/README.template.md
+CONTEXT: docs/templates/README.template.md
 SPEC: First line = the A/B invented-date number. Then: the one-sentence problem; a screenshot of the two
       DirectionCards showing different verdicts for the same address; **the three insider insights**; the
       generalisable-pipeline framing; how NVIDIA Nemotron models are used (tiering table with real costs, Nano
@@ -988,7 +988,7 @@ ACCEPTANCE: all seven docs present and internally consistent; every document in 
 ```
 ID: C-T40  TITLE: Video script + shot list (≤2:50)
 PHASE: 5  OWNER: content-agent + human  DEPENDS_ON: G4  BLOCKS: C-T41
-CONTEXT: _shared/templates/video-script.template.md ; docs/HOOK.md
+CONTEXT: docs/templates/video-script.template.md ; docs/HOOK.md
 SPEC:
   0:00–0:18  the problem, in Ruud's words, with the real cost-of-delay euro figure from C-T27 on screen and its
              source named as "interview, <role>, <date>". Plus one public congestion statistic with its source.
@@ -1040,7 +1040,7 @@ ACCEPTANCE: all sections present; no number disagrees with the README; the discl
 ```
 ID: C-T43  TITLE: Devpost feedback section (10 × $100 + swag)
 PHASE: 5  OWNER: human  DEPENDS_ON: docs/DISCREPANCIES.md  BLOCKS: G5
-CONTEXT: _shared/templates/devpost-feedback.template.md
+CONTEXT: docs/templates/devpost-feedback.template.md
 SPEC: ≥400 words, ≥6 specific points, ≥4 with numbers or quoted doc URLs, ≥1 concrete feature request. Material
       unique to this project: long-document context handling and the 16k-token output limit's effect on
       multi-document extraction; whether Token Factory could expose per-document chunk-level caching; Tavily's

@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/gridqueue/schemas/core-schemas.json",
   "title": "GridQueue core contracts",
-  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/app/models.py (Pydantic v2) and backend/tests/test_schemas.py.",
-  "schema_version": "1.0.0",
+  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation — see docs/DECISIONS.md.",
+  "schema_version": "1.1.0",
 
   "$defs": {
 
@@ -60,7 +60,7 @@
         "resolved_at": {"type": "string", "format": "date-time"},
         "abstain_reason": {"enum": ["unmapped_postcode", "malformed_postcode", "outside_supported_country", "no_dso_mapping", "ambiguous_match", null]}
       },
-      "allOf": [{"if": {"properties": {"resolved": {"const": true}}, "required": ["resolved"]}, "then": {"required": ["dso", "dso_evidence_citation"], "properties": {"dso": {"type": "string"}, "dso_evidence_citation": {"type": "string"}}}}]
+      "allOf": [{"if": {"properties": {"resolved": {"const": true}}, "required": ["resolved"]}, "then": {"required": ["dso", "dso_evidence_citation"], "properties": {"dso": {"type": "string", "minLength": 1}, "dso_evidence_citation": {"type": "string"}}}}]
     },
 
     "SourceDocument": {
@@ -112,7 +112,7 @@
         "quote_after": {"type": ["string", "null"], "description": "Verbatim, original language"},
         "document_ids": {"type": "array", "items": {"type": "string", "pattern": "^doc_"}}
       },
-      "allOf": [{"if": {"properties": {"source": {"const": "document_self_reported"}}, "required": ["source"]}, "then": {"required": ["quote_before", "quote_after"]}}]
+      "allOf": [{"if": {"properties": {"source": {"const": "document_self_reported"}}, "required": ["source"]}, "then": {"required": ["quote_before", "quote_after"], "properties": {"quote_before": {"type": "string", "minLength": 1}, "quote_after": {"type": "string", "minLength": 1}}}}]
     },
 
     "PositionClaim": {
@@ -126,7 +126,7 @@
         "direction": {"enum": ["feed_in", "consumption"], "description": "LAW: 'both' is not a valid claim direction. A claim must be about one direction."},
         "congestion_registered": {"enum": [true, false, "unknown"]},
         "queue_status": {"enum": ["OPEN", "CLOSED", "WAITLIST", "CONDITIONAL", "UNKNOWN"]},
-        "indicative_earliest_date": {"type": ["string", "null"], "description": "e.g. '2028-Q3', '2028', '2028-07'. Normalise to ISO-like partial dates; never free text."},
+        "indicative_earliest_date": {"type": ["string", "null"], "pattern": "^20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?(/20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?)?$", "description": "e.g. '2028-Q3', '2028', '2028-07', '2028-H2', '2028-07-14', or a range '2028/2029'. ISO-like partial dates only; free text fails validation."},
         "date_granularity": {"enum": ["year", "quarter", "month", "exact", "range", "none"]},
         "binding": {"enum": ["binding", "non_binding", "unknown"], "description": "INSIGHT #2 / GQ-BINDING-01. MUST be extracted from the document's own wording. Never null, never defaulted to 'binding'."},
         "binding_evidence_quote": {"type": ["string", "null"], "description": "The document's own words about binding status. Required when binding != 'unknown'."},
@@ -145,9 +145,9 @@
         "ledger_id": {"type": ["string", "null"]}
       },
       "allOf": [
-        {"if": {"required": ["indicative_earliest_date"], "properties": {"indicative_earliest_date": {"type": "string"}}}, "then": {"required": ["document_id", "verbatim_quote", "publication_date"]}, "description": "GQ-DATE-01: no date without a document, a quote and a publication date."},
-        {"if": {"properties": {"binding": {"enum": ["binding", "non_binding"]}}}, "then": {"required": ["binding_evidence_quote"]}, "description": "GQ-BINDING-01: an asserted binding status needs the source's own words."},
-        {"if": {"properties": {"available_capacity_kw": {"type": "number"}}, "required": ["available_capacity_kw"]}, "then": {"required": ["capacity_basis_quote"]}, "description": "GQ-KW-01"}
+        {"if": {"required": ["indicative_earliest_date"], "properties": {"indicative_earliest_date": {"type": "string"}}}, "then": {"required": ["document_id", "verbatim_quote", "publication_date"], "properties": {"publication_date": {"type": "string"}}}, "description": "GQ-DATE-01: no date without a document, a quote and a publication date."},
+        {"if": {"properties": {"binding": {"enum": ["binding", "non_binding"]}}}, "then": {"required": ["binding_evidence_quote"], "properties": {"binding_evidence_quote": {"type": "string", "minLength": 10}}}, "description": "GQ-BINDING-01: an asserted binding status needs the source's own words."},
+        {"if": {"properties": {"available_capacity_kw": {"type": "number"}}, "required": ["available_capacity_kw"]}, "then": {"required": ["capacity_basis_quote"], "properties": {"capacity_basis_quote": {"type": "string", "minLength": 10}}}, "description": "GQ-KW-01"}
       ]
     },
 
@@ -175,7 +175,7 @@
         "model_estimate_flag": {"type": "boolean"},
         "confidence": {"type": "number", "minimum": 0, "maximum": 1}
       },
-      "allOf": [{"if": {"properties": {"estimate_basis": {"const": "model_estimate"}}}, "then": {"properties": {"model_estimate_flag": {"const": true}}}}]
+      "allOf": [{"if": {"properties": {"estimate_basis": {"const": "model_estimate"}}, "required": ["estimate_basis"]}, "then": {"required": ["model_estimate_flag"], "properties": {"model_estimate_flag": {"const": true}}}, "description": "GQ-ESTIMATE-01"}, {"if": {"properties": {"estimate_basis": {"const": "computed_profile"}}, "required": ["estimate_basis"]}, "then": {"required": ["assumptions"], "properties": {"assumptions": {"minItems": 1}}}}]
     },
 
     "LoadProfile": {
@@ -228,7 +228,7 @@
         "position_claim": {"oneOf": [{"$ref": "#/$defs/PositionClaim"}, {"type": "null"}]},
         "binding_chip": {"enum": ["BINDING", "NON_BINDING", "UNKNOWN", "NOT_APPLICABLE"], "description": "The three states must be distinguishable in greyscale and under deuteranopia simulation — C-T07/C-T34."},
         "available_capacity_kw": {"type": ["number", "null"]},
-        "indicative_earliest_date": {"type": ["string", "null"]},
+        "indicative_earliest_date": {"type": ["string", "null"], "pattern": "^20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?(/20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?)?$"},
         "revision_history": {"type": "array", "items": {"$ref": "#/$defs/RevisionEvent"}},
         "gate_report": {"type": ["string", "null"], "pattern": "^gate_"},
         "abstentions": {"type": "array", "items": {"$ref": "#/$defs/Abstention"}},
@@ -288,7 +288,7 @@
         "selected_by": {"enum": ["registered_congestion", "control_sample", "manual"], "description": "METHODOLOGY LAW: a sweep containing only congested areas is cherry-picking. Include a control sample and label which is which."},
         "feed_in_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
         "consumption_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
-        "indicative_date": {"type": ["string", "null"]},
+        "indicative_date": {"type": ["string", "null"], "pattern": "^20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?(/20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?)?$"},
         "binding": {"enum": ["binding", "non_binding", "unknown", "not_applicable", null]},
         "available_capacity_kw": {"type": ["number", "null"]},
         "source_document_ids": {"type": "array", "items": {"type": "string"}},
@@ -315,8 +315,47 @@
       }
     },
 
-    "LedgerLine": {"$ref": "../../A-redflag-eu-product-safety/schemas/core-schemas.json#/$defs/LedgerLine"},
-    "Citation": {"$ref": "../../A-redflag-eu-product-safety/schemas/core-schemas.json#/$defs/Citation"}
+    "LedgerLine": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One line of runs/ledger.jsonl. Written by backend/app/tf/ledger.py — docs/PLATFORM-CAPABILITIES.md 'The ledger contract'.",
+      "required": ["id", "ts", "kind", "stage", "model", "request", "cost_usd", "latency_ms", "status"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^led_"},
+        "run_id": {"type": ["string", "null"]},
+        "ts": {"type": "string", "format": "date-time"},
+        "kind": {"enum": ["chat.completions", "embeddings", "tavily.search", "tavily.extract", "sandbox.operation", "sandbox.branch"]},
+        "stage": {"type": "string"},
+        "model": {"type": ["string", "null"]},
+        "request": {"type": "object", "required": ["prompt_tokens", "completion_tokens", "cached_tokens"], "properties": {"prompt_tokens": {"type": "integer", "minimum": 0}, "completion_tokens": {"type": "integer", "minimum": 0}, "cached_tokens": {"type": "integer", "minimum": 0}, "tools": {"type": "integer", "minimum": 0}}},
+        "response": {"type": ["object", "null"], "properties": {"finish_reason": {"type": ["string", "null"]}, "valid_json": {"type": ["boolean", "null"]}, "schema_ok": {"type": ["boolean", "null"]}}},
+        "cost_usd": {"type": "number", "minimum": 0},
+        "latency_ms": {"type": "number", "minimum": 0},
+        "status": {"enum": ["ok", "error", "truncated", "schema_violation", "gate_rejected"]},
+        "error": {"type": ["string", "null"]},
+        "citation_ids_produced": {"type": "array", "items": {"type": "string", "pattern": "^cit_"}},
+        "notes": {"type": ["string", "null"]}
+      }
+    },
+
+    "Citation": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Citation registry entry (ticket C-T12). trust='model_derived' is deliberately NOT a valid value: a model's prose can never be a citation. A fetched/source document citation must carry the sha256 of the corpus entry it points to.",
+      "required": ["id", "kind", "locator", "retrieved_at", "trust"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^cit_"},
+        "kind": {"enum": ["source_document", "fetched_document", "official_dataset", "regulation", "web_search", "sandbox_run", "computed", "measurement", "user_input"]},
+        "locator": {"type": "string", "minLength": 1, "description": "source_document: document_id + url + publication_date; computed: the computation and its inputs"},
+        "document_id": {"type": ["string", "null"], "pattern": "^doc_"},
+        "quote": {"type": ["string", "null"], "description": "Verbatim, original language"},
+        "retrieved_at": {"type": "string", "format": "date-time"},
+        "sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+        "ttl_seconds": {"type": ["integer", "null"], "minimum": 0},
+        "trust": {"enum": ["primary", "official_secondary", "web"]}
+      },
+      "allOf": [{"if": {"properties": {"kind": {"enum": ["source_document", "fetched_document"]}}, "required": ["kind"]}, "then": {"required": ["sha256", "quote", "document_id"], "properties": {"sha256": {"type": "string"}, "quote": {"type": "string", "minLength": 10}, "document_id": {"type": "string"}}}}]
+    }
   },
 
   "types": {
@@ -331,6 +370,8 @@
     "DirectionResult": {"$ref": "#/$defs/DirectionResult"},
     "Answer": {"$ref": "#/$defs/Answer"},
     "SweepArea": {"$ref": "#/$defs/SweepArea"},
-    "SweepReport": {"$ref": "#/$defs/SweepReport"}
+    "SweepReport": {"$ref": "#/$defs/SweepReport"},
+    "LedgerLine": {"$ref": "#/$defs/LedgerLine"},
+    "Citation": {"$ref": "#/$defs/Citation"}
   }
 }
