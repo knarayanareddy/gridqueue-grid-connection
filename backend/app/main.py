@@ -1,6 +1,7 @@
+import json
 from typing import Annotated, Any, Literal
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
 from app.config import Settings, get_settings, settings
@@ -73,6 +74,19 @@ async def post_answer(
         run_id=run_id,
         runs_dir=cfg.runs_dir,
     )
+
+
+AB_RESULTS_FILENAME = "ab_experiment_results.json"
+
+
+@app.get("/v1/ab-results")
+def get_ab_results(cfg: Annotated[Settings, Depends(get_settings)]) -> dict[str, Any]:
+    """Latest jobs/ab_branch_eval.py output (schemas/core-schemas.json#/$defs/AbExperimentResult)."""
+    path = cfg.runs_dir / AB_RESULTS_FILENAME
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="No A/B results yet. Run `make ab` to produce them.")
+    result: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return result
 
 
 def run() -> None:

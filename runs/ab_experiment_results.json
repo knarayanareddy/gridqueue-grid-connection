@@ -1,0 +1,1065 @@
+{
+  "experiment_id": "ab-gate-v1",
+  "generated_at": "2026-10-26T22:02:11Z",
+  "headline": "On 10 fabricated dates and 6 fabricated kW figures in a synthetic adversarial set: with the gate OFF, 10 dates and 6 kW figures reached the answer; with the gate ON, 0 and 0.",
+  "execution": {
+    "environment": "local_process",
+    "token_factory_sandbox": false,
+    "network_disabled": null,
+    "sandbox_image_uuid": null,
+    "branch_operation_ids": null,
+    "note": "Both arms ran in one local process from deep copies of the same per-case snapshot. Not yet run as Token Factory Sandbox branches."
+  },
+  "test_set": {
+    "path": "data/fixtures/synthetic/ab/adversarial_cases.json",
+    "version": "ab-v1",
+    "sha256": "0da6d3ff06fdcedf4d444719ae2d6dedf0a4793c2892dbb49cc2fcf16bc007c0",
+    "synthetic": true,
+    "proposal_source": "hand_written_adversarial",
+    "n_cases": 29,
+    "n_labelled_values": 36
+  },
+  "snapshot_id": "9d629531683d664c0d9a6e9dd02dc60049f49b79943a51e24f9e303938e2ee22",
+  "arms": [
+    {
+      "arm": "gate_on",
+      "gate_enabled": true,
+      "n_cases": 29,
+      "counters": {
+        "fabricated_dates": {
+          "total": 10,
+          "passed": 0
+        },
+        "fabricated_kw": {
+          "total": 6,
+          "passed": 0
+        },
+        "fabricated_binding": {
+          "total": 2,
+          "passed": 0
+        },
+        "fabricated_routes": {
+          "total": 3,
+          "passed": 0
+        },
+        "misattributed": {
+          "total": 5,
+          "passed": 4
+        },
+        "genuine": {
+          "total": 10,
+          "passed": 10
+        }
+      },
+      "spec_counters": {
+        "dates_without_document": 0,
+        "kw_without_quote": 0,
+        "binding_not_stated": 0,
+        "option_without_route": 0
+      },
+      "fabricated_values": {
+        "total": 21,
+        "passed": 0
+      },
+      "false_rejects": 0,
+      "verdicts": {
+        "CAPACITY_AVAILABLE": 4,
+        "NON_FIRM_ONLY": 3,
+        "NO_OFFICIAL_POSITION_FOUND": 2,
+        "WAITLIST_ONLY": 20
+      },
+      "gate_checks_run": 79,
+      "llm_calls_in_gate": 0
+    },
+    {
+      "arm": "gate_off",
+      "gate_enabled": false,
+      "n_cases": 29,
+      "counters": {
+        "fabricated_dates": {
+          "total": 10,
+          "passed": 10
+        },
+        "fabricated_kw": {
+          "total": 6,
+          "passed": 6
+        },
+        "fabricated_binding": {
+          "total": 2,
+          "passed": 2
+        },
+        "fabricated_routes": {
+          "total": 3,
+          "passed": 3
+        },
+        "misattributed": {
+          "total": 5,
+          "passed": 5
+        },
+        "genuine": {
+          "total": 10,
+          "passed": 10
+        }
+      },
+      "spec_counters": {
+        "dates_without_document": 10,
+        "kw_without_quote": 6,
+        "binding_not_stated": 2,
+        "option_without_route": 3
+      },
+      "fabricated_values": {
+        "total": 21,
+        "passed": 21
+      },
+      "false_rejects": 0,
+      "verdicts": {
+        "CAPACITY_AVAILABLE": 4,
+        "NON_FIRM_ONLY": 3,
+        "WAITLIST_ONLY": 22
+      },
+      "gate_checks_run": 0,
+      "llm_calls_in_gate": 0
+    }
+  ],
+  "delta": {
+    "fabricated_dates": {
+      "gate_on": 0,
+      "gate_off": 10,
+      "total": 10
+    },
+    "fabricated_kw": {
+      "gate_on": 0,
+      "gate_off": 6,
+      "total": 6
+    },
+    "fabricated_binding": {
+      "gate_on": 0,
+      "gate_off": 2,
+      "total": 2
+    },
+    "fabricated_routes": {
+      "gate_on": 0,
+      "gate_off": 3,
+      "total": 3
+    },
+    "misattributed": {
+      "gate_on": 4,
+      "gate_off": 5,
+      "total": 5
+    },
+    "genuine": {
+      "gate_on": 10,
+      "gate_off": 10,
+      "total": 10
+    }
+  },
+  "limitations": [
+    "The test set is synthetic and hand-written by the same project that wrote the gate. It shows which fabrication patterns the gate stops; it does not measure how often a real model invents dates.",
+    "The two arms ran in one local process from the same snapshot, not as Token Factory Sandbox branches.",
+    "Misattributed values (the quote is in the document but does not mean what is asserted): gate ON let 4 of 5 through. The gate checks that a value is stated in the quoted text, not what the sentence means."
+  ],
+  "per_case": [
+    {
+      "case_id": "G01",
+      "title": "Genuine indicative date + non-binding statement",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "75e93bc4da72910a48bd1a631a28df5a3899c21d1151684f19c8477123460959",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 4,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-Q3",
+          "label": "genuine",
+          "why": "The quote says 'derde kwartaal van 2028'.",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        },
+        {
+          "field": "binding",
+          "value": "non_binding",
+          "label": "genuine",
+          "why": "The document says 'indicatief en niet bindend'.",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "G02",
+      "title": "Genuine afname capacity",
+      "dso": "Enexis",
+      "direction": "consumption",
+      "snapshot_sha256": "64c15c3b6112e109c572813c56f9f2b45dd6bda07aa2e86a40269a1440ffba59",
+      "verdict": {
+        "gate_on": "CAPACITY_AVAILABLE",
+        "gate_off": "CAPACITY_AVAILABLE"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 250,
+          "label": "genuine",
+          "why": "The document states 'maximaal 250 kW afnamecapaciteit'.",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "G03",
+      "title": "Genuine routes and option kW",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "641b3ac6192cd58793474256eda9fc00f15b3b2bce6e91b463c00d620e144110",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 6,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 60,
+          "label": "genuine",
+          "why": "'tot 60 kW teruglevering mogelijk' with a niet-firm transportrecht.",
+          "kind": "non_firm_connection",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "non_firm_connection",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "flex_transport_agreement",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "congestion_management_participation",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "G04",
+      "title": "Genuine waitlist statement and route, no date",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "50ec21e47f64626fa87f2844d731c843020c9aa9bea7aa320ebf9ce319de784b",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "congestion_management_participation",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D01",
+      "title": "Date added to a real sentence that has no date",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "ccbd7f00ba4320443eb26c1e7258319802907fe4488bfdb9debf0be16a1dd303",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-Q2",
+          "label": "fabricated",
+          "why": "The sentence and the document state no date.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D02",
+      "title": "Invented sentence carrying an invented date",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "7d2bcc5ef8f124b6d43a75fe4a2209e645f76ace686a6b9ed2c8b139d994d0c9",
+      "verdict": {
+        "gate_on": "NO_OFFICIAL_POSITION_FOUND",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 1,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "quote_not_found_in_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027",
+          "label": "fabricated",
+          "why": "Neither the sentence nor the date is in the document.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D03",
+      "title": "Wrong quarter",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "62e02182671659ce1e7898204dc8fd91c4a1396393161562564fa2c4861a4d98",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-Q2",
+          "label": "fabricated",
+          "why": "The document says the third quarter, not the second.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D04",
+      "title": "Wrong year",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "d6406218a58314a187e5ec5eee79dea48d1be96cfff3b9b9f9e5a3d4b58fa535",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2029-Q3",
+          "label": "fabricated",
+          "why": "The document says 2028.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D05",
+      "title": "Invented precision",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "d8abe5ee020eaa6dac212f595e8018ba15c77b3a4718a341ec8bd035c2ba1bc4",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-07-01",
+          "label": "fabricated",
+          "why": "The document gives a quarter, not a day.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D06",
+      "title": "Date attached to a no-congestion sentence",
+      "dso": "Enexis",
+      "direction": "consumption",
+      "snapshot_sha256": "234226911a63910cd76a8a67c6bd05d8656e0a0601cef692ab2af1b886fc8fca",
+      "verdict": {
+        "gate_on": "CAPACITY_AVAILABLE",
+        "gate_off": "CAPACITY_AVAILABLE"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027",
+          "label": "fabricated",
+          "why": "No date is stated for afname.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D07",
+      "title": "Date attached to a conditional-access sentence",
+      "dso": "Liander",
+      "direction": "consumption",
+      "snapshot_sha256": "0675434723fb361618118f774933956914c3d65b1fcbad8dd7b6be24e9204a3e",
+      "verdict": {
+        "gate_on": "NON_FIRM_ONLY",
+        "gate_off": "NON_FIRM_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-H1",
+          "label": "fabricated",
+          "why": "The document states no date for afname.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D08",
+      "title": "Date asserted where the document says no date is known",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "bb181bb4abad0b6b9ac505f61bd83e14f9a19c19e82fbd02eeb1882948258b3e",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028",
+          "label": "fabricated",
+          "why": "The document explicitly says no indicative date is known.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D09",
+      "title": "Invented exact date in a paraphrased sentence",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "5e6f0dc4c7a364a40e6ec7056a3288b995e01c00700e340c6f5f601bc40bdc10",
+      "verdict": {
+        "gate_on": "NO_OFFICIAL_POSITION_FOUND",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 1,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "quote_not_found_in_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-01-01",
+          "label": "fabricated",
+          "why": "The document gives Q3 2028; this sentence is not in it.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "D10",
+      "title": "Date attached to the reference-date line",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "9bedb6631d49f07d1196fe8a1efa609e67bde042f4aa77994b68f312e686cf43",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "date_without_document"
+      ],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-Q4",
+          "label": "fabricated",
+          "why": "The line states 1 October 2026 as a reference date; 2027-Q4 is not stated.",
+          "counter": "fabricated_dates",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K01",
+      "title": "Invented capacity sentence",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "0b1c5b81cb9c514335bbc77d4f8bf043a6e865eba931e233643d9a2e3f0cccaf",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "kw_without_quote"
+      ],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 500,
+          "label": "fabricated",
+          "why": "No capacity figure is in the document.",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K02",
+      "title": "Magnitude error (250 → 2500)",
+      "dso": "Enexis",
+      "direction": "consumption",
+      "snapshot_sha256": "7472e7f2eb91f058c2af91dea0d481379c1b80aa1b7c7ba40634a1ff5ff02d3c",
+      "verdict": {
+        "gate_on": "CAPACITY_AVAILABLE",
+        "gate_off": "CAPACITY_AVAILABLE"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "kw_without_quote"
+      ],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 2500,
+          "label": "fabricated",
+          "why": "The document states 250 kW.",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K03",
+      "title": "Capacity attached to a sentence with no figure",
+      "dso": "Liander",
+      "direction": "consumption",
+      "snapshot_sha256": "59fa12312ca58bd01c46dd618069325bd2bf5272d91af67f510cc57ae2e1c74f",
+      "verdict": {
+        "gate_on": "NON_FIRM_ONLY",
+        "gate_off": "NON_FIRM_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "kw_without_quote"
+      ],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 100,
+          "label": "fabricated",
+          "why": "No figure is stated.",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K04",
+      "title": "Option kW attached to a route with no figure",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "4bf3ada5980395653302e780f101244e1fcef4bca04a7e3563695fcd4cc46dd8",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 4,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "kw_without_quote"
+      ],
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 150,
+          "label": "fabricated",
+          "why": "The flexcontract sentence states no capacity.",
+          "kind": "flex_transport_agreement",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "flex_transport_agreement",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K05",
+      "title": "Option kW changed (60 → 80)",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "673eb932901062e22263f390a2f1ab96f50cc4b37b2ee20bb816d3eaa5ed01d6",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 4,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "kw_without_quote"
+      ],
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 80,
+          "label": "fabricated",
+          "why": "The document states up to 60 kW.",
+          "kind": "non_firm_connection",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "non_firm_connection",
+          "counter": "genuine",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "K06",
+      "title": "Invented route with invented kW",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "8f0d8945d9ea9fcf4dce7a0db58598128e045a6fa48b6928922fa3c507c6b6b1",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "option_without_route"
+      ],
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 100,
+          "label": "fabricated",
+          "why": "No figure and no such route in the document.",
+          "kind": "non_firm_connection",
+          "counter": "fabricated_kw",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document describes no non-firm route.",
+          "kind": "non_firm_connection",
+          "counter": "fabricated_routes",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "B01",
+      "title": "Invented 'binding' sentence",
+      "dso": "Liander",
+      "direction": "feed_in",
+      "snapshot_sha256": "96615355acfe38aca414b12d50053653010c82c1e9c0c3daffde9fa3a3ac715b",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "binding_not_stated"
+      ],
+      "labels": [
+        {
+          "field": "binding",
+          "value": "binding",
+          "label": "fabricated",
+          "why": "The document never calls anything binding.",
+          "counter": "fabricated_binding",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "B02",
+      "title": "Invented 'onder voorbehoud' sentence",
+      "dso": "Enexis",
+      "direction": "consumption",
+      "snapshot_sha256": "dc4cb718117a969b7d8457862f9d0b4307bd0f4d3e028b01155e482b90369291",
+      "verdict": {
+        "gate_on": "CAPACITY_AVAILABLE",
+        "gate_off": "CAPACITY_AVAILABLE"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "binding_not_stated"
+      ],
+      "labels": [
+        {
+          "field": "binding",
+          "value": "non_binding",
+          "label": "fabricated",
+          "why": "The afname section has no binding statement; the sentence is invented.",
+          "counter": "fabricated_binding",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "R01",
+      "title": "Invented energy-hub route",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "5db38045f5f993b1c95ac343c158290389c784f25fca9e634c381daba15fe59b",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "option_without_route"
+      ],
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document mentions no energiehub.",
+          "kind": "energy_hub_participation",
+          "counter": "fabricated_routes",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "R02",
+      "title": "Invented collective route",
+      "dso": "Liander",
+      "direction": "consumption",
+      "snapshot_sha256": "721bd55c3a471a81e2ccb036d3ac89016de8049e7d6524324bc2c453e0586f9a",
+      "verdict": {
+        "gate_on": "NON_FIRM_ONLY",
+        "gate_off": "NON_FIRM_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 2,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "option_without_route"
+      ],
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document mentions no groepstransportovereenkomst.",
+          "kind": "collective_arrangement",
+          "counter": "fabricated_routes",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "M01",
+      "title": "Publication date presented as the availability date",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "735f0f5c910e54850f8397bc5051cee2d4d422d0695930030cc728223df011f4",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "date",
+          "value": "2026-07-14",
+          "label": "misattributed",
+          "why": "14 juli 2026 is the publication date, not when capacity returns.",
+          "counter": "misattributed",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "M02",
+      "title": "Eligibility threshold presented as available capacity",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "5c16e64364c04502abaec4bc69769879da84d6440140924d1afc59675cf3f34d",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 60,
+          "label": "misattributed",
+          "why": "'vanaf 60 kW' is a minimum size for congestion management, not available capacity.",
+          "counter": "misattributed",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "M03",
+      "title": "Afname capacity presented as feed-in capacity",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "6034e2e942ba3ea87eec544d09a9198b39a89e3d38c9e4bf469d076ff141f349",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "kw",
+          "value": 250,
+          "label": "misattributed",
+          "why": "250 kW is stated for afname, not teruglevering.",
+          "counter": "misattributed",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "M04",
+      "title": "Date sentence presented as a binding commitment",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "8c54c5e470cf8bde10c9457474616baaffc58be6f86402e18e5542aff2dfe3a7",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [],
+      "labels": [
+        {
+          "field": "binding",
+          "value": "binding",
+          "label": "misattributed",
+          "why": "The sentence gives a date but says nothing about it being binding (the document calls it niet bindend).",
+          "counter": "misattributed",
+          "reached_gate_on": true,
+          "reached_gate_off": true
+        }
+      ]
+    },
+    {
+      "case_id": "M05",
+      "title": "Congestion-management sentence presented as a waiting-list route",
+      "dso": "Enexis",
+      "direction": "feed_in",
+      "snapshot_sha256": "878236e6b32649dc1e5b0c058e7c1361ab259bf894628b5c8d13f0e1d6784652",
+      "verdict": {
+        "gate_on": "WAITLIST_ONLY",
+        "gate_off": "WAITLIST_ONLY"
+      },
+      "gate_checks_run": {
+        "gate_on": 3,
+        "gate_off": 0
+      },
+      "rejected_reasons_gate_on": [
+        "option_without_route"
+      ],
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "misattributed",
+          "why": "The sentence describes congestion management, not registering on the waiting list.",
+          "kind": "queue_registration",
+          "counter": "misattributed",
+          "reached_gate_on": false,
+          "reached_gate_off": true
+        }
+      ]
+    }
+  ]
+}

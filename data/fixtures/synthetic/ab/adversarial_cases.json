@@ -1,0 +1,1160 @@
+{
+  "_synthetic": true,
+  "_note": "SYNTHETIC adversarial test set for the C-T23 gate_on/gate_off experiment, hand-written by the GridQueue project. Each case is a stand-in for one model extraction over one SYNTHETIC fixture document. Labels are assigned by hand: genuine = the value is stated in the cited source with that meaning; fabricated = the value (or its quote) is not stated in the cited source; misattributed = the quote is in the source but does not mean what is asserted. This set tests the gate's mechanism; it does NOT measure how often a real model hallucinates.",
+  "version": "ab-v1",
+  "documents": {
+    "enexis_eindhoven": "documents/enexis_eindhoven.txt",
+    "liander_amsterdam": "documents/liander_amsterdam.txt"
+  },
+  "cases": [
+    {
+      "id": "G01",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Genuine indicative date + non-binding statement",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2028-Q3",
+            "binding": "non_binding",
+            "binding_evidence_quote": "Deze codeerprognose is indicatief en niet bindend; de datum kan wijzigen.",
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-Q3",
+          "label": "genuine",
+          "why": "The quote says 'derde kwartaal van 2028'."
+        },
+        {
+          "field": "binding",
+          "value": "non_binding",
+          "label": "genuine",
+          "why": "The document says 'indicatief en niet bindend'."
+        }
+      ]
+    },
+    {
+      "id": "G02",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Genuine afname capacity",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor afname is in de regio Eindhoven geen congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": false,
+            "queue_status": "OPEN",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 250,
+            "capacity_basis_quote": "Per nieuwe aansluiting is maximaal 250 kW afnamecapaciteit beschikbaar.",
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 250,
+          "label": "genuine",
+          "why": "The document states 'maximaal 250 kW afnamecapaciteit'."
+        }
+      ]
+    },
+    {
+      "id": "G03",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Genuine routes and option kW",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "non_firm_connection",
+            "route_quote": "Een niet-firm transportrecht met een curtailmentregeling kunt u aanvragen via het aanvraagformulier grootzakelijke aansluitingen; hiermee is tot 60 kW teruglevering mogelijk.",
+            "estimated_kw_enabled": 60,
+            "kw_quote": "hiermee is tot 60 kW teruglevering mogelijk.",
+            "confidence": 0.7
+          },
+          {
+            "kind": "flex_transport_agreement",
+            "route_quote": "Een flexcontract (transportovereenkomst op maat) kunt u bespreken met uw accountmanager grootzakelijk.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          },
+          {
+            "kind": "congestion_management_participation",
+            "route_quote": "Deelname aan congestiemanagement staat open voor aansluitingen vanaf 60 kW; aanmelden gaat via de congestiemanagementregeling op de website van de netbeheerder.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 60,
+          "label": "genuine",
+          "why": "'tot 60 kW teruglevering mogelijk' with a niet-firm transportrecht.",
+          "kind": "non_firm_connection"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "non_firm_connection"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "flex_transport_agreement"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "congestion_management_participation"
+        }
+      ]
+    },
+    {
+      "id": "G04",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Genuine waitlist statement and route, no date",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "congestion_management_participation",
+            "route_quote": "Wie op de wachtlijst staat, kan zich aanmelden voor congestiemanagement via het klantportaal.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "congestion_management_participation"
+        }
+      ]
+    },
+    {
+      "id": "D01",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Date added to a real sentence that has no date",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2027-Q2",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-Q2",
+          "label": "fabricated",
+          "why": "The sentence and the document state no date."
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented sentence carrying an invented date",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Capaciteit voor teruglevering komt terug in 2027.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2027",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027",
+          "label": "fabricated",
+          "why": "Neither the sentence nor the date is in the document."
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Wrong quarter",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2028-Q2",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-Q2",
+          "label": "fabricated",
+          "why": "The document says the third quarter, not the second."
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Wrong year",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2029-Q3",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2029-Q3",
+          "label": "fabricated",
+          "why": "The document says 2028."
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented precision",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2028-07-01",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-07-01",
+          "label": "fabricated",
+          "why": "The document gives a quarter, not a day."
+        }
+      ]
+    },
+    {
+      "id": "D06",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Date attached to a no-congestion sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor afname is in de regio Eindhoven geen congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": false,
+            "queue_status": "OPEN",
+            "indicative_earliest_date": "2027",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027",
+          "label": "fabricated",
+          "why": "No date is stated for afname."
+        }
+      ]
+    },
+    {
+      "id": "D07",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Date attached to a conditional-access sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Nieuwe aanvragen voor afname worden alleen onder voorwaarden toegekend.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "CONDITIONAL",
+            "indicative_earliest_date": "2027-H1",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-H1",
+          "label": "fabricated",
+          "why": "The document states no date for afname."
+        }
+      ]
+    },
+    {
+      "id": "D08",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Date asserted where the document says no date is known",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Er is nog geen indicatieve datum bekend waarop weer capaciteit beschikbaar komt.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2028",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028",
+          "label": "fabricated",
+          "why": "The document explicitly says no indicative date is known."
+        }
+      ]
+    },
+    {
+      "id": "D09",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented exact date in a paraphrased sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De datum waarop weer productiecapaciteit beschikbaar komt is 1 januari 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2028-01-01",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2028-01-01",
+          "label": "fabricated",
+          "why": "The document gives Q3 2028; this sentence is not in it."
+        }
+      ]
+    },
+    {
+      "id": "D10",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Date attached to the reference-date line",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Peildatum: 1 oktober 2026.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2027-Q4",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2027-Q4",
+          "label": "fabricated",
+          "why": "The line states 1 October 2026 as a reference date; 2027-Q4 is not stated."
+        }
+      ]
+    },
+    {
+      "id": "K01",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented capacity sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 500,
+            "capacity_basis_quote": "Er is 500 kW beschikbaar voor teruglevering.",
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 500,
+          "label": "fabricated",
+          "why": "No capacity figure is in the document."
+        }
+      ]
+    },
+    {
+      "id": "K02",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Magnitude error (250 → 2500)",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor afname is in de regio Eindhoven geen congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": false,
+            "queue_status": "OPEN",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 2500,
+            "capacity_basis_quote": "Per nieuwe aansluiting is maximaal 250 kW afnamecapaciteit beschikbaar.",
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 2500,
+          "label": "fabricated",
+          "why": "The document states 250 kW."
+        }
+      ]
+    },
+    {
+      "id": "K03",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Capacity attached to a sentence with no figure",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Nieuwe aanvragen voor afname worden alleen onder voorwaarden toegekend.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "CONDITIONAL",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 100,
+            "capacity_basis_quote": "Nieuwe aanvragen voor afname worden alleen onder voorwaarden toegekend.",
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 100,
+          "label": "fabricated",
+          "why": "No figure is stated."
+        }
+      ]
+    },
+    {
+      "id": "K04",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Option kW attached to a route with no figure",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "flex_transport_agreement",
+            "route_quote": "Een flexcontract (transportovereenkomst op maat) kunt u bespreken met uw accountmanager grootzakelijk.",
+            "estimated_kw_enabled": 150,
+            "kw_quote": "Een flexcontract (transportovereenkomst op maat) kunt u bespreken met uw accountmanager grootzakelijk.",
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 150,
+          "label": "fabricated",
+          "why": "The flexcontract sentence states no capacity.",
+          "kind": "flex_transport_agreement"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "flex_transport_agreement"
+        }
+      ]
+    },
+    {
+      "id": "K05",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Option kW changed (60 → 80)",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "non_firm_connection",
+            "route_quote": "Een niet-firm transportrecht met een curtailmentregeling kunt u aanvragen via het aanvraagformulier grootzakelijke aansluitingen; hiermee is tot 60 kW teruglevering mogelijk.",
+            "estimated_kw_enabled": 80,
+            "kw_quote": "hiermee is tot 60 kW teruglevering mogelijk.",
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 80,
+          "label": "fabricated",
+          "why": "The document states up to 60 kW.",
+          "kind": "non_firm_connection"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "genuine",
+          "why": "Route sentence is in the document.",
+          "kind": "non_firm_connection"
+        }
+      ]
+    },
+    {
+      "id": "K06",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented route with invented kW",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "non_firm_connection",
+            "route_quote": "Een niet-firma aansluiting kan direct worden aangevraagd via het klantportaal.",
+            "estimated_kw_enabled": 100,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "option_kw",
+          "value": 100,
+          "label": "fabricated",
+          "why": "No figure and no such route in the document.",
+          "kind": "non_firm_connection"
+        },
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document describes no non-firm route.",
+          "kind": "non_firm_connection"
+        }
+      ]
+    },
+    {
+      "id": "B01",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented 'binding' sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "binding",
+            "binding_evidence_quote": "De datum is bindend.",
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "binding",
+          "value": "binding",
+          "label": "fabricated",
+          "why": "The document never calls anything binding."
+        }
+      ]
+    },
+    {
+      "id": "B02",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Invented 'onder voorbehoud' sentence",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor afname is in de regio Eindhoven geen congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": false,
+            "queue_status": "OPEN",
+            "indicative_earliest_date": null,
+            "binding": "non_binding",
+            "binding_evidence_quote": "Deze capaciteit is onder voorbehoud.",
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "binding",
+          "value": "non_binding",
+          "label": "fabricated",
+          "why": "The afname section has no binding statement; the sentence is invented."
+        }
+      ]
+    },
+    {
+      "id": "R01",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Invented energy-hub route",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "energy_hub_participation",
+            "route_quote": "Deelname aan een energiehub kunt u aanvragen via het klantportaal.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document mentions no energiehub.",
+          "kind": "energy_hub_participation"
+        }
+      ]
+    },
+    {
+      "id": "R02",
+      "postcode": "1012",
+      "doc": "liander_amsterdam",
+      "direction": "consumption",
+      "power_kw": 60,
+      "title": "Invented collective route",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Nieuwe aanvragen voor afname worden alleen onder voorwaarden toegekend.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "CONDITIONAL",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": null,
+            "publication_date_quote": null,
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "collective_arrangement",
+            "route_quote": "Een groepstransportovereenkomst kunt u aanvragen bij uw accountmanager.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "fabricated",
+          "why": "The document mentions no groepstransportovereenkomst.",
+          "kind": "collective_arrangement"
+        }
+      ]
+    },
+    {
+      "id": "M01",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Publication date presented as the availability date",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": "2026-07-14",
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "date",
+          "value": "2026-07-14",
+          "label": "misattributed",
+          "why": "14 juli 2026 is the publication date, not when capacity returns."
+        }
+      ]
+    },
+    {
+      "id": "M02",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Eligibility threshold presented as available capacity",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 60,
+            "capacity_basis_quote": "Deelname aan congestiemanagement staat open voor aansluitingen vanaf 60 kW; aanmelden gaat via de congestiemanagementregeling op de website van de netbeheerder.",
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 60,
+          "label": "misattributed",
+          "why": "'vanaf 60 kW' is a minimum size for congestion management, not available capacity."
+        }
+      ]
+    },
+    {
+      "id": "M03",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Afname capacity presented as feed-in capacity",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": 250,
+            "capacity_basis_quote": "Per nieuwe aansluiting is maximaal 250 kW afnamecapaciteit beschikbaar.",
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "kw",
+          "value": 250,
+          "label": "misattributed",
+          "why": "250 kW is stated for afname, not teruglevering."
+        }
+      ]
+    },
+    {
+      "id": "M04",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Date sentence presented as a binding commitment",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "binding",
+            "binding_evidence_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": []
+      },
+      "labels": [
+        {
+          "field": "binding",
+          "value": "binding",
+          "label": "misattributed",
+          "why": "The sentence gives a date but says nothing about it being binding (the document calls it niet bindend)."
+        }
+      ]
+    },
+    {
+      "id": "M05",
+      "postcode": "5612",
+      "doc": "enexis_eindhoven",
+      "direction": "feed_in",
+      "power_kw": 60,
+      "title": "Congestion-management sentence presented as a waiting-list route",
+      "proposal": {
+        "claims": [
+          {
+            "verbatim_quote": "Voor teruglevering is in de regio Eindhoven congestie geregistreerd.",
+            "page_or_row": null,
+            "congestion_registered": true,
+            "queue_status": "WAITLIST",
+            "indicative_earliest_date": null,
+            "binding": "unknown",
+            "binding_evidence_quote": null,
+            "available_capacity_kw": null,
+            "capacity_basis_quote": null,
+            "publication_date": "2026-07-14",
+            "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+            "confidence": 0.7
+          }
+        ],
+        "options": [
+          {
+            "kind": "queue_registration",
+            "route_quote": "Deelname aan congestiemanagement staat open voor aansluitingen vanaf 60 kW; aanmelden gaat via de congestiemanagementregeling op de website van de netbeheerder.",
+            "estimated_kw_enabled": null,
+            "kw_quote": null,
+            "confidence": 0.7
+          }
+        ]
+      },
+      "labels": [
+        {
+          "field": "route",
+          "value": null,
+          "label": "misattributed",
+          "why": "The sentence describes congestion management, not registering on the waiting list.",
+          "kind": "queue_registration"
+        }
+      ]
+    }
+  ]
+}

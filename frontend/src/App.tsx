@@ -1,8 +1,9 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import {
   AlertTriangle,
   Check,
   CircleDashed,
+  FlaskConical,
   Copy,
   FileText,
   HelpCircle,
@@ -15,6 +16,9 @@ import {
   X,
 } from "lucide-react";
 import type {
+  AbCounterName,
+  AbExperimentResult,
+  AbLabel,
   BindingChip as BindingChipValue,
   Citation,
   Direction,
@@ -296,7 +300,7 @@ function GateReport({ data }: { data: QueryResponse }) {
 
 // ---------------------------------------------------------------------------------------------- app
 
-export default function App() {
+function QueryView() {
   const [postcode, setPostcode] = useState("5612 AB");
   const [kw, setKw] = useState("60");
   const [direction, setDirection] = useState<Direction>("feed_in");
@@ -349,15 +353,7 @@ export default function App() {
   const result = data?.answer.per_direction[0];
 
   return (
-    <div className="shell">
-      <header className="masthead">
-        <div className="brand">
-          <span className="brand__mark" aria-hidden="true" />
-          GridQueue
-        </div>
-        <p className="muted">Grid-connection answers in the operator's own words — or an honest “we don't know”.</p>
-      </header>
-
+    <>
       <form className="card query" onSubmit={submit} aria-label="Grid position query">
         <label className="field">
           <span>Postcode</span>
@@ -453,6 +449,291 @@ export default function App() {
             </footer>
           </>
         )}
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------------------------- A/B gate evidence
+
+const AB_ROWS: { key: AbCounterName; label: string; good: "zero" | "all" | "context" }[] = [
+  { key: "fabricated_dates", label: "Fabricated dates", good: "zero" },
+  { key: "fabricated_kw", label: "Fabricated kW figures", good: "zero" },
+  { key: "fabricated_binding", label: "Fabricated binding claims", good: "zero" },
+  { key: "fabricated_routes", label: "Fabricated application routes", good: "zero" },
+  { key: "misattributed", label: "Misattributed (real quote, wrong meaning)", good: "context" },
+  { key: "genuine", label: "Genuine values kept", good: "all" },
+];
+
+function formatLabelValue(lab: AbLabel): string {
+  if (lab.value === null) return lab.kind ?? "—";
+  if (lab.field === "date") return formatPartialDate(String(lab.value));
+  if (lab.field === "kw" || lab.field === "option_kw") return `${lab.value} kW`;
+  return String(lab.value);
+}
+
+function Reached({ reached }: { reached: boolean }) {
+  return reached ? (
+    <span className="reach reach--yes">
+      <Check size={13} aria-hidden="true" /> in answer
+    </span>
+  ) : (
+    <span className="reach reach--no">
+      <X size={13} aria-hidden="true" /> blocked
+    </span>
+  );
+}
+
+/** One counter, both arms, as two bars. Width is the share of labelled values that reached the answer. */
+function CounterBars({ total, on, off }: { total: number; on: number; off: number }) {
+  const pct = (n: number) => (total ? `${(100 * n) / total}%` : "0%");
+  return (
+    <div className="ab-bars" aria-hidden="true">
+      <span className="ab-bar ab-bar--off" style={{ width: pct(off) }} />
+      <span className="ab-bar ab-bar--on" style={{ width: pct(on) }} />
+    </div>
+  );
+}
+
+function AbEvidence() {
+  const [result, setResult] = useState<AbExperimentResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    fetch("/v1/ab-results", { signal: ac.signal })
+      .then(async (res) => {
+        if (!res.ok) {
+          const body = await res.json().catch(() => null);
+          throw new Error(typeof body?.detail === "string" ? body.detail : `The server returned ${res.status}.`);
+        }
+        setResult((await res.json()) as AbExperimentResult);
+      })
+      .catch((err: Error) => {
+        if (err.name !== "AbortError") setError(err.message || "Could not load the A/B results.");
+      });
+    return () => ac.abort();
+  }, []);
+
+  if (error) {
+    return (
+      <p className="card error" role="alert">
+        <AlertTriangle size={16} aria-hidden="true" /> {error}
+      </p>
+    );
+  }
+  if (!result) {
+    return (
+      <p className="muted row">
+        <Loader2 size={16} className="spin" aria-hidden="true" /> Loading measured results…
+      </p>
+    );
+  }
+
+  const ex = result.execution;
+  const ts = result.test_set;
+  return (
+    <div className="results">
+      {ts.synthetic && (
+        <p className="banner" role="note">
+          <AlertTriangle size={16} aria-hidden="true" />
+          SYNTHETIC test set — {ts.n_cases} hand-written adversarial cases over synthetic operator documents, not real
+          model output.
+        </p>
+      )}
+      {!ex.token_factory_sandbox && (
+        <p className="banner" role="note">
+          <AlertTriangle size={16} aria-hidden="true" />
+          Ran as a local process, not in a Token Factory Sandbox. Both arms started from the same snapshot.
+        </p>
+      )}
+
+      <section className="card" aria-labelledby="ab-heading">
+        <h2 id="ab-heading" className="section-title">
+          <FlaskConical size={18} aria-hidden="true" /> Same inputs, gate on vs gate off
+        </h2>
+        <p className="headline">{result.headline}</p>
+        <div className="ab-legend small muted">
+          <span>
+            <span className="ab-swatch ab-bar--off" /> Gate OFF (model proposals accepted as-is)
+          </span>
+          <span>
+            <span className="ab-swatch ab-bar--on" /> Gate ON (deterministic citation gate)
+          </span>
+        </div>
+        <table className="ab-table">
+          <caption className="sr-only">Labelled values that reached the final answer, per arm</caption>
+          <thead>
+            <tr>
+              <th scope="col">Labelled values</th>
+              <th scope="col" className="num">
+                Gate OFF
+              </th>
+              <th scope="col" className="num">
+                Gate ON
+              </th>
+              <th scope="col">
+                <span className="sr-only">Chart</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {AB_ROWS.map(({ key, label, good }) => {
+              const d = result.delta[key];
+              return (
+                <tr key={key} className={good === "context" ? "is-limit" : undefined}>
+                  <th scope="row">{label}</th>
+                  <td className="num mono">
+                    {d.gate_off}/{d.total}
+                  </td>
+                  <td className="num mono">
+                    <strong>
+                      {d.gate_on}/{d.total}
+                    </strong>
+                  </td>
+                  <td>
+                    <CounterBars total={d.total} on={d.gate_on} off={d.gate_off} />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p className="muted small">
+          Each number counts labelled values that reached the final answer. For fabricated values, lower is better; for
+          genuine values, all should be kept. Gate ON ran {result.arms.find((a) => a.arm === "gate_on")?.gate_checks_run}{" "}
+          checks with {result.arms.find((a) => a.arm === "gate_on")?.llm_calls_in_gate} LLM calls.
+        </p>
+      </section>
+
+      <section className="card" aria-labelledby="limits-heading">
+        <h2 id="limits-heading" className="section-title">
+          What this does not show
+        </h2>
+        <ul className="limits">
+          {result.limitations.map((l) => (
+            <li key={l}>{l}</li>
+          ))}
+        </ul>
+      </section>
+
+      <details className="card gate">
+        <summary>
+          <FileText size={16} aria-hidden="true" /> Per-case results · {result.per_case.length} cases
+        </summary>
+        <ol className="ab-cases">
+          {result.per_case.map((c) => (
+            <li key={c.case_id}>
+              <div className="row">
+                <span className="mono">{c.case_id}</span>
+                <strong>{c.title}</strong>
+                <span className="muted small">
+                  {c.dso} · {DIRECTION_LABEL[c.direction]}
+                </span>
+              </div>
+              <ul className="ab-labels">
+                {c.labels.map((lab, i) => (
+                  <li key={`${c.case_id}-${i}`}>
+                    <span className={`chip chip--${lab.label === "genuine" ? "solid" : "dashed"}`}>{lab.label}</span>
+                    <span className="mono">
+                      {lab.field}: {formatLabelValue(lab)}
+                    </span>
+                    <span className="small">
+                      OFF <Reached reached={lab.reached_gate_off} /> · ON <Reached reached={lab.reached_gate_on} />
+                    </span>
+                    <span className="muted small ab-why">{lab.why}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="muted small">
+                Verdict: OFF {VERDICT_LABEL[c.verdict.gate_off]} · ON {VERDICT_LABEL[c.verdict.gate_on]}
+                {c.rejected_reasons_gate_on.length > 0 && (
+                  <>
+                    {" "}
+                    · gate reasons <span className="mono">{c.rejected_reasons_gate_on.join(", ")}</span>
+                  </>
+                )}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </details>
+
+      <footer className="foot muted small">
+        <p>
+          {result.experiment_id} · test set {ts.version} <span className="mono">sha256 {shortSha(ts.sha256)}</span> ·
+          snapshot <span className="mono">{shortSha(result.snapshot_id)}</span> · generated{" "}
+          {formatTimestamp(result.generated_at)}
+        </p>
+        <p>{ex.note}</p>
+      </footer>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------------------------- shell
+
+const TABS = [
+  { id: "direction", label: "Direction Card" },
+  { id: "ab", label: "A/B Gate Evidence" },
+] as const;
+type TabId = (typeof TABS)[number]["id"];
+
+export default function App() {
+  const [tab, setTab] = useState<TabId>("direction");
+  const [abOpened, setAbOpened] = useState(false);
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  function select(id: TabId) {
+    setTab(id);
+    if (id === "ab") setAbOpened(true);
+  }
+
+  function onKey(e: KeyboardEvent<HTMLDivElement>) {
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+    const i = TABS.findIndex((t) => t.id === tab);
+    const next = TABS[(i + (e.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length].id;
+    select(next);
+    tabRefs.current[next]?.focus();
+  }
+
+  return (
+    <div className="shell">
+      <header className="masthead">
+        <div className="brand">
+          <span className="brand__mark" aria-hidden="true" />
+          GridQueue
+        </div>
+        <p className="muted">Grid-connection answers in the operator's own words — or an honest “we don't know”.</p>
+      </header>
+
+      <div className="tabs" role="tablist" aria-label="Views" onKeyDown={onKey}>
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            ref={(el) => (tabRefs.current[t.id] = el)}
+            type="button"
+            role="tab"
+            id={`tab-${t.id}`}
+            aria-selected={tab === t.id}
+            aria-controls={`panel-${t.id}`}
+            tabIndex={tab === t.id ? 0 : -1}
+            className={tab === t.id ? "tab is-active" : "tab"}
+            onClick={() => select(t.id)}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Both panels stay mounted so a query survives switching tabs. */}
+      <div role="tabpanel" id="panel-direction" aria-labelledby="tab-direction" hidden={tab !== "direction"}>
+        <div className="results">
+          <QueryView />
+        </div>
+      </div>
+      <div role="tabpanel" id="panel-ab" aria-labelledby="tab-ab" hidden={tab !== "ab"}>
+        {abOpened && <AbEvidence />}
       </div>
     </div>
   );
