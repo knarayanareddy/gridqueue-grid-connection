@@ -332,6 +332,75 @@ def _gate_option(ctx: Any, gate: _Gate, raw: dict[str, Any]) -> dict[str, Any] |
     }
     option["id"] = _hash_id("opt", option)
     option["citation_ids"] = [_citation(ctx, doc, route)]
+    kw_quote = raw.get("kw_quote")
+    if kw is not None and kw_quote and normalise(kw_quote) != normalise(route):
+        # Keep the verified kW evidence so the application pack can re-check it offline (C-T21).
+        option["citation_ids"].append(_citation(ctx, doc, kw_quote))
+    return option
+
+
+# ----------------------------------------------------------------------------- A/B gate-off arm (C-T23)
+# Used ONLY by jobs/ab_branch_eval.py to measure what the gate prevents. Model proposals are copied into the
+# answer as they are: no quote, date, kW, binding, route or direction check. Never reachable from the API.
+
+
+def _raw_claim(ctx: Any, raw: dict[str, Any]) -> dict[str, Any] | None:
+    doc = ctx.document(raw["document_id"])
+    if doc is None:  # structural: a claim must point at a retrieved document to be cited at all
+        return None
+    quote = raw.get("verbatim_quote") or ""
+    date = raw.get("indicative_earliest_date")
+    claim = {
+        "direction": ctx.direction,
+        "congestion_registered": raw["congestion_registered"],
+        "queue_status": raw["queue_status"],
+        "indicative_earliest_date": date,
+        "date_granularity": _date_granularity(date),
+        "binding": raw.get("binding", "unknown"),
+        "binding_evidence_quote": raw.get("binding_evidence_quote"),
+        "non_binding_markers_found": _markers(quote, raw.get("binding_evidence_quote")),
+        "available_capacity_kw": raw.get("available_capacity_kw"),
+        "capacity_basis_quote": raw.get("capacity_basis_quote"),
+        "document_id": doc["document_id"],
+        "verbatim_quote": quote,
+        "quote_language": "nl",
+        "our_translation": None,
+        "page_or_row": raw.get("page_or_row"),
+        "publication_date": raw.get("publication_date"),
+        "confidence": float(raw["confidence"]),
+    }
+    claim["id"] = _hash_id("pc", claim)
+    claim["dso"] = ctx.location["dso"]
+    claim["congestion_area_id"] = None
+    claim["citation_id"] = _citation(ctx, doc, quote)
+    claim["downgrade_to_verify"] = False
+    claim["ledger_id"] = ctx.llm_ledger_id
+    return claim
+
+
+def _raw_option(ctx: Any, raw: dict[str, Any]) -> dict[str, Any] | None:
+    doc = ctx.document(raw["document_id"])
+    if doc is None:
+        return None
+    kind = raw["kind"]
+    route = raw.get("route_quote") or ""
+    option = {
+        "kind": kind,
+        "title": KIND_LABEL[kind],
+        "estimated_kw_enabled": raw.get("estimated_kw_enabled"),
+        "estimate_basis": "document_quote",
+        "assumptions": [],
+        "prerequisites": [],
+        "application_route": route,
+        "who_to_contact": ctx.location["dso"],
+        "contact_detail": None,
+        "expected_lead_time": None,
+        "evidence_document_ids": [doc["document_id"]],
+        "model_estimate_flag": False,
+        "confidence": float(raw["confidence"]),
+    }
+    option["id"] = _hash_id("opt", option)
+    option["citation_ids"] = [_citation(ctx, doc, route)]
     return option
 
 
@@ -405,6 +474,10 @@ def _no_position(ctx: Any, script: dict[str, Any]) -> list[dict[str, Any]]:
 class AssembleAnswer:
     name = "s5_answer"
 
+    def __init__(self, *, verify: bool = True) -> None:
+        # verify=False is the A/B "gate_off" arm (jobs/ab_branch_eval.py). The API always uses the default.
+        self.verify = verify
+
     def build(self, ctx: Any, total_started: float) -> dict[str, Any]:
         started = time.perf_counter()
         gate = _Gate()
@@ -415,11 +488,11 @@ class AssembleAnswer:
         options: list[dict[str, Any]] = []
         if loc["resolved"]:
             for raw in extraction["claims"]:
-                c = _gate_claim(ctx, gate, raw)
+                c = _gate_claim(ctx, gate, raw) if self.verify else _raw_claim(ctx, raw)
                 if c is not None:
                     claims.append(c)
             for raw in extraction["options"]:
-                o = _gate_option(ctx, gate, raw)
+                o = _gate_option(ctx, gate, raw) if self.verify else _raw_option(ctx, raw)
                 if o is not None and all(o["id"] != x["id"] for x in options):
                     options.append(o)
 

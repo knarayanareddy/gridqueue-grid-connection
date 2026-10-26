@@ -135,3 +135,81 @@ export interface QueryResponse {
     model?: string | null;
   };
 }
+
+// ------------------------------------------------------------------ A/B gate evidence (schemas/core-schemas.json#/$defs/AbExperimentResult)
+
+export type AbCounterName =
+  | "fabricated_dates"
+  | "fabricated_kw"
+  | "fabricated_binding"
+  | "fabricated_routes"
+  | "misattributed"
+  | "genuine";
+
+export interface AbCount {
+  total: number;
+  passed: number;
+}
+
+export interface AbArm {
+  arm: "gate_on" | "gate_off";
+  gate_enabled: boolean;
+  n_cases: number;
+  counters: Record<AbCounterName, AbCount>;
+  fabricated_values: AbCount;
+  false_rejects: number;
+  verdicts: Partial<Record<Verdict, number>>;
+  gate_checks_run: number;
+  llm_calls_in_gate: number;
+}
+
+export interface AbLabel {
+  field: "date" | "kw" | "option_kw" | "binding" | "route";
+  value: string | number | null;
+  label: "fabricated" | "misattributed" | "genuine";
+  why: string;
+  kind?: string;
+  counter: AbCounterName;
+  reached_gate_on: boolean;
+  reached_gate_off: boolean;
+}
+
+export interface AbCase {
+  case_id: string;
+  title: string;
+  dso: string;
+  direction: Direction;
+  snapshot_sha256: string;
+  verdict: { gate_on: Verdict; gate_off: Verdict };
+  gate_checks_run: { gate_on: number; gate_off: number };
+  rejected_reasons_gate_on: string[];
+  labels: AbLabel[];
+}
+
+export interface AbExperimentResult {
+  experiment_id: string;
+  generated_at: string;
+  headline: string;
+  execution: {
+    environment: "local_process" | "token_factory_sandbox";
+    token_factory_sandbox: boolean;
+    network_disabled: boolean | null;
+    sandbox_image_uuid: string | null;
+    branch_operation_ids: string[] | null;
+    note: string;
+  };
+  test_set: {
+    path: string;
+    version: string;
+    sha256: string;
+    synthetic: boolean;
+    proposal_source: string;
+    n_cases: number;
+    n_labelled_values: number;
+  };
+  snapshot_id: string;
+  arms: AbArm[];
+  delta: Record<AbCounterName, { gate_on: number; gate_off: number; total: number }>;
+  limitations: string[];
+  per_case: AbCase[];
+}

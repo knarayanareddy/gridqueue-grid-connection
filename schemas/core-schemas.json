@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/gridqueue/schemas/core-schemas.json",
   "title": "GridQueue core contracts",
-  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation. v1.2.0: added QueryResponse (additive; the POST /v1/answer envelope) — see docs/DECISIONS.md.",
-  "schema_version": "1.2.0",
+  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation. v1.2.0: added QueryResponse (additive; the POST /v1/answer envelope) — see docs/DECISIONS.md. v1.3.0: added AbExperimentResult (additive; jobs/ab_branch_eval.py output, ticket C-T21-T23).",
+  "schema_version": "1.3.0",
 
   "$defs": {
 
@@ -315,6 +315,110 @@
       }
     },
 
+    "AbExperimentResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Output of jobs/ab_branch_eval.py (ticket C-T21-T23): the same snapshot run down a gate_on and a gate_off arm. 'passed' = the labelled value reached that arm's final answer. For 'genuine', passed = kept.",
+      "required": ["experiment_id", "generated_at", "headline", "execution", "test_set", "snapshot_id", "arms", "delta", "limitations", "per_case"],
+      "properties": {
+        "experiment_id": {"type": "string"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "headline": {"type": "string", "minLength": 1},
+        "execution": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["environment", "token_factory_sandbox", "network_disabled", "sandbox_image_uuid", "branch_operation_ids", "note"],
+          "properties": {
+            "environment": {"enum": ["local_process", "token_factory_sandbox"]},
+            "token_factory_sandbox": {"type": "boolean"},
+            "network_disabled": {"type": ["boolean", "null"]},
+            "sandbox_image_uuid": {"type": ["string", "null"]},
+            "branch_operation_ids": {"type": ["object", "null"]},
+            "note": {"type": "string"}
+          },
+          "allOf": [
+            {"if": {"properties": {"environment": {"const": "local_process"}}},
+             "then": {"properties": {"token_factory_sandbox": {"const": false}, "sandbox_image_uuid": {"type": "null"}, "branch_operation_ids": {"type": "null"}}}},
+            {"if": {"properties": {"environment": {"const": "token_factory_sandbox"}}},
+             "then": {"properties": {"token_factory_sandbox": {"const": true}, "sandbox_image_uuid": {"type": "string"}, "branch_operation_ids": {"type": "object"}, "network_disabled": {"type": "boolean"}}}}
+          ]
+        },
+        "test_set": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["path", "version", "sha256", "synthetic", "proposal_source", "n_cases", "n_labelled_values"],
+          "properties": {
+            "path": {"type": "string"},
+            "version": {"type": "string"},
+            "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+            "synthetic": {"type": "boolean"},
+            "proposal_source": {"enum": ["hand_written_adversarial", "recorded_model_output"]},
+            "n_cases": {"type": "integer", "minimum": 1},
+            "n_labelled_values": {"type": "integer", "minimum": 1}
+          }
+        },
+        "snapshot_id": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "arms": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["arm", "gate_enabled", "n_cases", "counters", "spec_counters", "fabricated_values", "false_rejects", "verdicts", "gate_checks_run", "llm_calls_in_gate"],
+            "properties": {
+              "arm": {"enum": ["gate_on", "gate_off"]},
+              "gate_enabled": {"type": "boolean"},
+              "n_cases": {"type": "integer", "minimum": 1},
+              "counters": {"type": "object", "additionalProperties": false, "required": ["fabricated_dates", "fabricated_kw", "fabricated_binding", "fabricated_routes", "misattributed", "genuine"], "properties": {"fabricated_dates": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}, "fabricated_kw": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}, "fabricated_binding": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}, "fabricated_routes": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}, "misattributed": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}, "genuine": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}}}},
+              "spec_counters": {"type": "object", "additionalProperties": false, "required": ["dates_without_document", "kw_without_quote", "binding_not_stated", "option_without_route"], "properties": {"dates_without_document": {"type": "integer", "minimum": 0}, "kw_without_quote": {"type": "integer", "minimum": 0}, "binding_not_stated": {"type": "integer", "minimum": 0}, "option_without_route": {"type": "integer", "minimum": 0}}},
+              "fabricated_values": {"type": "object", "additionalProperties": false, "required": ["total", "passed"], "properties": {"total": {"type": "integer", "minimum": 0}, "passed": {"type": "integer", "minimum": 0}}},
+              "false_rejects": {"type": "integer", "minimum": 0},
+              "verdicts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+              "gate_checks_run": {"type": "integer", "minimum": 0},
+              "llm_calls_in_gate": {"const": 0}
+            }
+          }
+        },
+        "delta": {"type": "object", "additionalProperties": false, "required": ["fabricated_dates", "fabricated_kw", "fabricated_binding", "fabricated_routes", "misattributed", "genuine"], "properties": {"fabricated_dates": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}, "fabricated_kw": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}, "fabricated_binding": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}, "fabricated_routes": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}, "misattributed": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}, "genuine": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off", "total"], "properties": {"gate_on": {"type": "integer", "minimum": 0}, "gate_off": {"type": "integer", "minimum": 0}, "total": {"type": "integer", "minimum": 0}}}}},
+        "limitations": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "per_case": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["case_id", "title", "dso", "direction", "snapshot_sha256", "verdict", "gate_checks_run", "rejected_reasons_gate_on", "labels"],
+            "properties": {
+              "case_id": {"type": "string"},
+              "title": {"type": "string"},
+              "dso": {"type": ["string", "null"]},
+              "direction": {"enum": ["feed_in", "consumption"]},
+              "snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "verdict": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off"], "properties": {"gate_on": {"type": "string"}, "gate_off": {"type": "string"}}},
+              "gate_checks_run": {"type": "object", "additionalProperties": false, "required": ["gate_on", "gate_off"], "properties": {"gate_on": {"type": "integer"}, "gate_off": {"type": "integer"}}},
+              "rejected_reasons_gate_on": {"type": "array", "items": {"type": "string"}},
+              "labels": {
+                "type": "array", "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": ["field", "value", "label", "why", "counter", "reached_gate_on", "reached_gate_off"],
+                  "properties": {
+                    "field": {"enum": ["date", "kw", "binding", "option_kw", "route"]},
+                    "kind": {"type": "string"},
+                    "value": {"type": ["string", "number", "null"]},
+                    "label": {"enum": ["genuine", "fabricated", "misattributed"]},
+                    "why": {"type": "string", "minLength": 1},
+                    "counter": {"enum": ["fabricated_dates", "fabricated_kw", "fabricated_binding", "fabricated_routes", "misattributed", "genuine"]},
+                    "reached_gate_on": {"type": "boolean"},
+                    "reached_gate_off": {"type": "boolean"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
     "QueryResponse": {
       "type": "object",
       "additionalProperties": false,
@@ -402,6 +506,7 @@
     "SweepReport": {"$ref": "#/$defs/SweepReport"},
     "LedgerLine": {"$ref": "#/$defs/LedgerLine"},
     "Citation": {"$ref": "#/$defs/Citation"},
-    "QueryResponse": {"$ref": "#/$defs/QueryResponse"}
+    "QueryResponse": {"$ref": "#/$defs/QueryResponse"},
+    "AbExperimentResult": {"$ref": "#/$defs/AbExperimentResult"}
   }
 }

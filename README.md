@@ -4,8 +4,10 @@
 > official Dutch grid-operator documents, refuses to invent a date, and ranks the non-firm and flexibility
 > routes you can use today.**
 >
-> _Headline number: pending. It will come from the gate-on vs gate-off experiment (SPEC ticket C-T23), e.g.
-> "60 queries · 0 invented dates with the gate on · N without it". No figure goes here until it has been measured._
+> _Measured so far (C-T23, `make ab`): on a **SYNTHETIC, hand-written** adversarial set of 29 cases, 10 fabricated
+> dates and 6 fabricated kW figures reached the answer with the gate **off**, and **0 and 0** with it on; 10/10
+> genuine values were kept. The set was designed to contain those fabrications, so this shows what the gate stops,
+> not how often a real model invents dates. The planned 60-query run on real model output is still pending._
 
 **Not legal or connection advice.** GridQueue reports what grid operators have published, at a stated
 retrieval time. It does not predict capacity and is not affiliated with any grid operator.
@@ -27,7 +29,7 @@ against the real APIs, and the corpus of official documents does not exist yet.
 
 | Component | Status | Where |
 |---|---|---|
-| Data contracts (JSON Schema v1.2.0, 18 `$defs` incl. `QueryResponse`) | ✅ built, contract-tested | `schemas/core-schemas.json`, `backend/tests/test_schemas.py` |
+| Data contracts (JSON Schema v1.3.0, 19 `$defs` incl. `QueryResponse`, `AbExperimentResult`) | ✅ built, contract-tested | `schemas/core-schemas.json`, `backend/tests/test_schemas.py` |
 | Deterministic citation gate: quote-in-source, date-in-quote, kW-in-quote | ✅ built, tested | `backend/app/gate/gate.py`, `backend/tests/test_gate.py` |
 | Telemetry ledger (`runs/ledger.jsonl`) | ✅ built, tested; written by every Tavily and model call | `backend/app/tf/ledger.py` |
 | API (`/health`, `/v1/info`, `POST /v1/answer` → `QueryResponse`) | ✅ contract-tested | `backend/app/main.py`, `backend/app/pipeline.py` |
@@ -36,8 +38,10 @@ against the real APIs, and the corpus of official documents does not exist yet.
 | Source corpus (≥8 hashed official documents) | ⏳ not started, register is a template | `data/source-register.v0.json` |
 | Postcode → DSO table | 🟡 3 ranges from the ticket (Eindhoven/Enexis, Amsterdam/Liander, Rotterdam/Stedin), **unverified** | `backend/app/stages/s1_resolve_location.py`, C-T04 |
 | Tavily retrieval, Nemotron extraction, options | 🟡 wired + mocked tests; live run not yet done; offline mode uses SYNTHETIC fixtures | `backend/app/tools/tavily.py`, `backend/app/stages/`, `data/fixtures/synthetic/` |
-| Token Factory Sandbox pack, A/B branching, Serverless sweep | ⏳ not started | SPEC §3 S6, A/B and batch lanes |
-| Frontend UI (Direction Card, ranked options, quote pill, gate report) | ✅ builds; one direction per query | `frontend/src/App.tsx` |
+| Offline application pack: re-verifies every citation, date and kW against document sha256 + gate; withholds the pack on any failure; network-off guard | 🟡 built and tested locally; **not yet run in a Token Factory Sandbox** (runbook in the C-T21-T23 report) | `backend/app/sandbox/pack.py` |
+| Gate-on vs gate-off A/B over a SYNTHETIC adversarial set | 🟡 measured as **local** arms from one snapshot; not yet Sandbox branches | `jobs/ab_branch_eval.py`, `runs/ab_experiment_results.json` |
+| Serverless sweep | ⏳ not started | SPEC §3 batch lane |
+| Frontend UI (Direction Card, ranked options, quote pill, gate report; A/B Gate Evidence tab) | ✅ builds; one direction per query | `frontend/src/App.tsx` |
 | CI | ⏳ workflow written, not yet enabled | [`docs/ci/README.md`](docs/ci/README.md) |
 
 ---
@@ -51,7 +55,8 @@ git clone https://github.com/knarayanareddy/gridqueue-grid-connection.git
 cd gridqueue-grid-connection
 make sample   # gate + contracts + /v1/answer replayed end to end on SYNTHETIC fixtures, offline
 make check    # ruff lint + format check, mypy, full pytest suite
-make api      # FastAPI on http://0.0.0.0:8000 (/health, /v1/info, POST /v1/answer)
+make ab       # gate ON vs OFF over the SYNTHETIC adversarial set -> runs/ab_experiment_results.json
+make api      # FastAPI on http://0.0.0.0:8000 (/health, /v1/info, POST /v1/answer, GET /v1/ab-results)
 
 # UI (second terminal; proxies /v1 to the API on :8000)
 cd frontend && npm ci && npm run dev    # http://localhost:5173 — try 5612 AB, 1012, 3011
@@ -64,6 +69,7 @@ from the **SYNTHETIC** fixtures in `data/fixtures/synthetic/` and says so in the
 |---|:---:|---|
 | `make sample` | No | The gate rejects paraphrased quotes, drops dates and kW figures that the quote doesn't state, and the schemas reject undocumented dates and unquoted binding claims. `/v1/answer` returns contract-valid answers, and an invented date in (synthetic) model output never reaches the answer |
 | `make check` | No | Lint, types and the full test suite pass from a clean clone |
+| `make ab` | No | Same snapshot, two arms: with the gate off every fabricated date, kW, binding claim and route in the synthetic set reaches the answer; with it on, none do. Also reports what the gate **misses** (4 of 5 misattributed values) |
 | `make api` | No | The service starts and reports which keys are configured |
 
 `make demo` (live end-to-end on a real postcode) and `make batch` (Serverless sweep) are **planned**. They
@@ -108,7 +114,9 @@ Matching is case-sensitive. Only text-extraction artefacts are normalised: white
 hyphenation at line ends, non-breaking spaces, curly quotes and dashes. Dates are matched in Dutch and English
 ("Q3 2028", "derde kwartaal van 2028", "14 juli 2028"), and the quarter, half or month must sit next to the
 year. kW figures accept Dutch and English number formats and MW→kW conversion. The gate checks that a value
-is **stated**, not that the sentence **means** it; that's why the quote is always shown to the user.
+is **stated**, not that the sentence **means** it; that's why the quote is always shown to the user. The A/B
+run measures this gap: a real publication date presented as the availability date, a 60 kW threshold read as
+capacity, a consumption figure used for feed-in, and a "binding" claim backed by a non-binding sentence all pass.
 
 ---
 
@@ -118,8 +126,8 @@ Each row states the plan (from SPEC §2) and what evidence exists **now**.
 
 | Criterion | Plan | Evidence today |
 |---|---|---|
-| **Technological Implementation** | Nemotron Nano/Super/Ultra routing on Token Factory; Tavily as runtime retrieval; hashed corpus with revision tracking; Sandbox network-off validation; Sandbox branching A/B; Serverless sweep; complete ledger | Gate + contracts + ledger, 100+ tests. No model calls yet |
-| **Design** | Direction × date × options card; source pill on every date; greyscale-distinguishable binding chip; keyboard accessible | Design tokens only |
+| **Technological Implementation** | Nemotron Nano/Super/Ultra routing on Token Factory; Tavily as runtime retrieval; hashed corpus with revision tracking; Sandbox network-off validation; Sandbox branching A/B; Serverless sweep; complete ledger | Gate + contracts + ledger, 190 tests; offline pack with hash re-verification; local gate-on/off A/B on a synthetic set. No live model or Sandbox runs yet |
+| **Design** | Direction × date × options card; source pill on every date; greyscale-distinguishable binding chip; keyboard accessible | Direction Card, quote pills, binding chip and an A/B Gate Evidence tab, all built on the design tokens; no user testing yet |
 | **Potential Impact** | ≥200-area sweep with methodology; ≥3 real interviews | Not started |
 | **Quality of the Idea** | Three insights above; refusal state (`NO_OFFICIAL_POSITION_FOUND`) shown on camera | Gate + schema enforce the refusal rules at contract level |
 
@@ -141,9 +149,12 @@ Each row states the plan (from SPEC §2) and what evidence exists **now**.
 │   ├── app/config.py           <- settings (env / .env)
 │   ├── app/gate/gate.py        <- deterministic tri-state gate
 │   ├── app/tf/ledger.py        <- append-only telemetry ledger
+│   ├── app/sandbox/pack.py     <- offline application pack (stdlib + gate only)
 │   └── tests/                  <- gate, schema-contract, ledger and API tests
 ├── frontend/                   <- package.json + design tokens (UI not started)
+├── jobs/ab_branch_eval.py      <- gate-on vs gate-off experiment (make ab)
 ├── jobs/Dockerfile             <- container image (sweep job pending)
+├── runs/ab_experiment_results.json <- latest A/B result (shown in the UI)
 └── runs/sample_ledger.jsonl    <- example ledger line
 ```
 

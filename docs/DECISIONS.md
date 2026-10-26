@@ -96,3 +96,36 @@ means two calls.
   script.
 - Options are ranked: stated kW ≥ request first, then stated kW descending, then a fixed kind order, then id.
   No model confidence is used in ranking.
+
+## 2026-10-26 · C-T21-T23 (offline application pack, gate-on vs gate-off A/B)
+
+**D-015 · The pack re-verifies everything it prints, and is withheld on any failure.**
+`build_pack` takes a bundle (`QueryResponse` + document texts) and re-checks it with no network:
+- every document text must hash to its `sha256`;
+- a citation is used only if it is `source_document`, has a matching sha256, and its quote passes GQ-QUOTE;
+- every claim quote, date, kW, binding statement, option route and option kW is re-run through the gate
+  against the hash-verified text.
+
+Any failure raises `PackVerificationError` and no bytes are produced (CLI exit 2). The pack is deterministic for
+a given bundle and is returned with its own sha256. It imports only the stdlib and `app.gate.gate`, so it can run in
+a guest with no packages and no network.
+
+**D-016 · The gate-off arm is a flag on S5, not a second pipeline.**
+`AssembleAnswer(verify=False)` keeps the same S1–S3 snapshot and verdict tables but takes model proposals
+as-is (only an unknown document id is refused, because the answer could not be built). `run_stages` was split
+out of `answer_query` so both arms can start from one `RunContext`. `/v1/answer` has no way to set the flag;
+a test posts `verify: false` and checks the gate still ran.
+
+**D-017 · Four plus two counters.**
+The SPEC's four counters (dates without document, kW without quote, binding not stated, option without route)
+are reported as `spec_counters`. Each one is backed by a labelled `fabricated_*` counter with its total. Two
+more counters are reported: `genuine` (false rejects) and `misattributed`, where the quote is real but means
+something else. That counter is where the gate is weak (4 of 5 pass), and hiding it would overstate the result.
+
+**D-018 · A verified option kW cites its own quote.**
+When an option's kW figure is verified against a quote other than its route quote, S5 now adds a citation for
+that quote. The pack can then show where the figure came from.
+
+**D-019 · A/B results are committed and served read-only.**
+`make ab` writes `runs/ab_experiment_results.json`. `GET /v1/ab-results` serves it (404 with the command to run
+if it is missing). A test fails if the committed file differs from a fresh run (ignoring `generated_at`).

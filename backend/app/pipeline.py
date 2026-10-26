@@ -49,7 +49,7 @@ def new_run_id() -> str:
     return uuid.uuid4().hex[:16]
 
 
-async def answer_query(
+async def run_stages(
     *,
     postcode: str,
     power_kw: float,
@@ -57,8 +57,8 @@ async def answer_query(
     services: Services,
     run_id: str,
     runs_dir: Any = None,
-) -> dict[str, Any]:
-    total_started = time.perf_counter()
+) -> RunContext:
+    """S1 → S2 → S3. Returns the context S5 assembles from (also the A/B snapshot, see jobs/ab_branch_eval.py)."""
     ctx = RunContext(
         run_id=run_id,
         postcode=postcode,
@@ -88,11 +88,31 @@ async def answer_query(
     if s1.ok:
         await RetrieveDocuments().run(ctx)
         await ExtractPositions().run(ctx)
+    return ctx
 
-    answer = AssembleAnswer().build(ctx, total_started)
+
+def query_response(ctx: RunContext, answer: dict[str, Any]) -> dict[str, Any]:
     return {
         "answer": answer,
         "documents": ctx.documents,
         "citations": list(ctx.citations.values()),
         "retrieval": ctx.retrieval,
     }
+
+
+async def answer_query(
+    *,
+    postcode: str,
+    power_kw: float,
+    direction: Literal["feed_in", "consumption"],
+    services: Services,
+    run_id: str,
+    runs_dir: Any = None,
+) -> dict[str, Any]:
+    total_started = time.perf_counter()
+    ctx = await run_stages(
+        postcode=postcode, power_kw=power_kw, direction=direction, services=services, run_id=run_id, runs_dir=runs_dir
+    )
+    # The API always runs the gate. There is deliberately no parameter to turn it off.
+    answer = AssembleAnswer().build(ctx, total_started)
+    return query_response(ctx, answer)
