@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/gridqueue/schemas/core-schemas.json",
   "title": "GridQueue core contracts",
-  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation — see docs/DECISIONS.md.",
-  "schema_version": "1.1.0",
+  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation. v1.2.0: added QueryResponse (additive; the POST /v1/answer envelope) — see docs/DECISIONS.md.",
+  "schema_version": "1.2.0",
 
   "$defs": {
 
@@ -315,6 +315,35 @@
       }
     },
 
+    "QueryResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Envelope returned by POST /v1/answer (ticket C-T14-T19). Answer carries only document ids; the UI also needs the cited documents (publisher, url, retrieved_at, sha256) and the citation entries, plus an honest account of how retrieval ran.",
+      "required": ["answer", "documents", "citations", "retrieval"],
+      "properties": {
+        "answer": {"$ref": "#/$defs/Answer"},
+        "documents": {"type": "array", "items": {"$ref": "#/$defs/SourceDocument"}, "description": "Every document retrieved for this answer, cited or not"},
+        "citations": {"type": "array", "items": {"$ref": "#/$defs/Citation"}},
+        "retrieval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mode", "synthetic", "performed_at", "tavily_calls", "results_seen", "results_used", "results_rejected", "extraction"],
+          "properties": {
+            "mode": {"enum": ["live", "fixture"], "description": "live = Tavily + Token Factory at request time; fixture = committed local fixtures, no network"},
+            "synthetic": {"type": "boolean", "description": "True when any document is a SYNTHETIC fixture. The UI MUST show this prominently."},
+            "performed_at": {"type": "string", "format": "date-time"},
+            "queries": {"type": "array", "items": {"type": "string"}},
+            "tavily_calls": {"type": "integer", "minimum": 0},
+            "results_seen": {"type": "integer", "minimum": 0},
+            "results_used": {"type": "integer", "minimum": 0},
+            "results_rejected": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["url", "reason"], "properties": {"url": {"type": "string"}, "reason": {"enum": ["not_official_domain", "extract_failed", "empty_content", "duplicate", "over_limit"]}}}},
+            "extraction": {"enum": ["live_model", "replay", "not_run"], "description": "replay = recorded SYNTHETIC model output from data/fixtures"},
+            "model": {"type": ["string", "null"]}
+          }
+        }
+      }
+    },
+
     "LedgerLine": {
       "type": "object",
       "additionalProperties": false,
@@ -372,6 +401,7 @@
     "SweepArea": {"$ref": "#/$defs/SweepArea"},
     "SweepReport": {"$ref": "#/$defs/SweepReport"},
     "LedgerLine": {"$ref": "#/$defs/LedgerLine"},
-    "Citation": {"$ref": "#/$defs/Citation"}
+    "Citation": {"$ref": "#/$defs/Citation"},
+    "QueryResponse": {"$ref": "#/$defs/QueryResponse"}
   }
 }

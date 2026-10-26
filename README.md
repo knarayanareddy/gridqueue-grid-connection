@@ -20,21 +20,24 @@ retrieval time. It does not predict capacity and is not affiliated with any grid
 ## ⚠️ Build status (honest, as of 26 Oct 2026)
 
 This repository is in **Phase 0** of the plan in [`SPEC.md` §8](SPEC.md). The contracts and the deterministic
-gate are built and tested. The retrieval → extraction → answer pipeline is **not built yet**.
+gate are built and tested. A first end-to-end slice — postcode → operator → Tavily retrieval → Nemotron
+extraction → gate → `/v1/answer` → Direction Card UI — is wired (ticket C-T14-T19). **It runs offline on
+SYNTHETIC fixtures only**; the live path is unit-tested with mocked Tavily/model calls but has not yet been run
+against the real APIs, and the corpus of official documents does not exist yet.
 
 | Component | Status | Where |
 |---|---|---|
-| Data contracts (JSON Schema, 14 types) | ✅ built, contract-tested | `schemas/core-schemas.json`, `backend/tests/test_schemas.py` |
+| Data contracts (JSON Schema v1.2.0, 18 `$defs` incl. `QueryResponse`) | ✅ built, contract-tested | `schemas/core-schemas.json`, `backend/tests/test_schemas.py` |
 | Deterministic citation gate: quote-in-source, date-in-quote, kW-in-quote | ✅ built, tested | `backend/app/gate/gate.py`, `backend/tests/test_gate.py` |
-| Telemetry ledger (`runs/ledger.jsonl`) | ✅ built, tested; not yet wired to any model call | `backend/app/tf/ledger.py` |
-| API skeleton (`/health`, `/v1/info`) | ✅ | `backend/app/main.py` |
+| Telemetry ledger (`runs/ledger.jsonl`) | ✅ built, tested; written by every Tavily and model call | `backend/app/tf/ledger.py` |
+| API (`/health`, `/v1/info`, `POST /v1/answer` → `QueryResponse`) | ✅ contract-tested | `backend/app/main.py`, `backend/app/pipeline.py` |
 | Design tokens | ✅ | `frontend/src/tokens.css` |
-| Full answer gate (TTL, binding, route, no-position rules; determinism hash) | ⏳ planned | SPEC §6 |
+| Answer gate: quote, date, kW, binding, route and no-position rules; determinism hash | 🟡 built for one direction per request; TTL/currency check not yet | `backend/app/stages/s5_answer.py` |
 | Source corpus (≥8 hashed official documents) | ⏳ not started, register is a template | `data/source-register.v0.json` |
-| Postcode → DSO table | ⏳ not started | SPEC ticket C-T04 |
-| Tavily retrieval, Nemotron extraction, options | ⏳ not started | SPEC §3 S2–S4 |
+| Postcode → DSO table | 🟡 3 ranges from the ticket (Eindhoven/Enexis, Amsterdam/Liander, Rotterdam/Stedin), **unverified** | `backend/app/stages/s1_resolve_location.py`, C-T04 |
+| Tavily retrieval, Nemotron extraction, options | 🟡 wired + mocked tests; live run not yet done; offline mode uses SYNTHETIC fixtures | `backend/app/tools/tavily.py`, `backend/app/stages/`, `data/fixtures/synthetic/` |
 | Token Factory Sandbox pack, A/B branching, Serverless sweep | ⏳ not started | SPEC §3 S6, A/B and batch lanes |
-| Frontend UI | ⏳ not started (only `package.json` + tokens) | `frontend/` |
+| Frontend UI (Direction Card, ranked options, quote pill, gate report) | ✅ builds; one direction per query | `frontend/src/App.tsx` |
 | CI | ⏳ workflow written, not yet enabled | [`docs/ci/README.md`](docs/ci/README.md) |
 
 ---
@@ -46,14 +49,20 @@ Requires [uv](https://docs.astral.sh/uv/) (`curl -LsSf https://astral.sh/uv/inst
 ```bash
 git clone https://github.com/knarayanareddy/gridqueue-grid-connection.git
 cd gridqueue-grid-connection
-make sample   # deterministic gate + schema contracts, offline
+make sample   # gate + contracts + /v1/answer replayed end to end on SYNTHETIC fixtures, offline
 make check    # ruff lint + format check, mypy, full pytest suite
-make api      # FastAPI on http://0.0.0.0:8000 (/health, /v1/info)
+make api      # FastAPI on http://0.0.0.0:8000 (/health, /v1/info, POST /v1/answer)
+
+# UI (second terminal; proxies /v1 to the API on :8000)
+cd frontend && npm ci && npm run dev    # http://localhost:5173 — try 5612 AB, 1012, 3011
 ```
+
+Without both `NEBIUS_API_KEY` and `TAVILY_API_KEY` (or with `MOCK_EXTERNAL_CALLS=true`), `/v1/answer` answers
+from the **SYNTHETIC** fixtures in `data/fixtures/synthetic/` and says so in the response and the UI.
 
 | Command | Needs a key? | What it proves today |
 |---|:---:|---|
-| `make sample` | No | The gate rejects paraphrased quotes, drops dates and kW figures that the quote doesn't state, and the schemas reject undocumented dates and unquoted binding claims |
+| `make sample` | No | The gate rejects paraphrased quotes, drops dates and kW figures that the quote doesn't state, and the schemas reject undocumented dates and unquoted binding claims. `/v1/answer` returns contract-valid answers, and an invented date in (synthetic) model output never reaches the answer |
 | `make check` | No | Lint, types and the full test suite pass from a clean clone |
 | `make api` | No | The service starts and reports which keys are configured |
 

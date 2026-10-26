@@ -1,6 +1,10 @@
-from fastapi import FastAPI
+from typing import Annotated, Any, Literal
 
-from app.config import settings
+from fastapi import Depends, FastAPI
+from pydantic import BaseModel, Field
+
+from app.config import Settings, get_settings, settings
+from app.pipeline import Services, answer_query, build_services, new_run_id
 
 TITLE = "GridQueue — Energy Grid Interconnection Navigator & Flex Planner"
 
@@ -35,6 +39,40 @@ def get_info() -> dict[str, object]:
             "tavily": settings.has_tavily_key,
         },
     }
+
+
+class AnswerRequest(BaseModel):
+    postcode: str = Field(min_length=4, max_length=8, description="Dutch postcode, e.g. '5612' or '5612 AB'")
+    power_kw: float = Field(gt=0, le=100_000, description="Requested capacity in kW")
+    direction: Literal["feed_in", "consumption"]
+
+
+class ServiceFactory:
+    """Dependency that builds per-request external services. Overridden in tests."""
+
+    def __call__(self, cfg: Annotated[Settings, Depends(get_settings)]) -> tuple[Services, str, Settings]:
+        run_id = new_run_id()
+        return build_services(cfg, run_id), run_id, cfg
+
+
+service_factory = ServiceFactory()
+
+
+@app.post("/v1/answer")
+async def post_answer(
+    body: AnswerRequest,
+    deps: Annotated[tuple[Services, str, Settings], Depends(service_factory)],
+) -> dict[str, Any]:
+    """Direction-aware answer. Returns a QueryResponse (schemas/core-schemas.json#/$defs/QueryResponse)."""
+    services, run_id, cfg = deps
+    return await answer_query(
+        postcode=body.postcode,
+        power_kw=body.power_kw,
+        direction=body.direction,
+        services=services,
+        run_id=run_id,
+        runs_dir=cfg.runs_dir,
+    )
 
 
 def run() -> None:

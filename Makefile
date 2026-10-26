@@ -8,7 +8,7 @@ BACKEND := backend
 
 help:
 	@echo "Available commands:"
-	@echo "  make sample    - Offline, no API key: run the deterministic gate + schema contract tests"
+	@echo "  make sample    - Offline, no API key: gate + contracts + /v1/answer on SYNTHETIC fixtures"
 	@echo "  make check     - Lint, typecheck and run the full test suite (what CI runs)"
 	@echo "  make test      - Run the full pytest suite"
 	@echo "  make lint      - ruff lint + format check"
@@ -20,10 +20,10 @@ help:
 require-uv:
 	@command -v $(UV) >/dev/null 2>&1 || { echo "uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
 
-# NOTE: the full offline pipeline replay (one committed fixture query end to end, SPEC ticket C-T01) does not
-# exist yet. Until it does, `make sample` exercises the parts that are built: the gate and the contracts.
+# Offline, no key: the gate, the contracts, and POST /v1/answer replayed end to end on the SYNTHETIC fixtures
+# in data/fixtures/synthetic/ (live-path tests in that file use mocked Tavily/model clients, no network).
 sample: require-uv
-	cd $(BACKEND) && $(UV) run --extra dev pytest tests/test_gate.py tests/test_schemas.py -v
+	cd $(BACKEND) && $(UV) run --extra dev pytest tests/test_gate.py tests/test_schemas.py tests/test_answer_api.py -v
 
 check: lint typecheck test
 

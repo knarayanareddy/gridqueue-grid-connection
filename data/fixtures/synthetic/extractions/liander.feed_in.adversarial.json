@@ -1,0 +1,54 @@
+{
+  "_synthetic": true,
+  "_note": "ADVERSARIAL hand-written stand-in for model output. It invents a date (2027-Q2) that the document does not state, fabricates a binding quote, a kW figure, a second claim and a route. The gate must reject every invented element.",
+  "claims": [
+    {
+      "document_id": "liander_amsterdam",
+      "verbatim_quote": "Aanvragen worden op de wachtlijst geplaatst.",
+      "page_or_row": null,
+      "congestion_registered": true,
+      "queue_status": "WAITLIST",
+      "indicative_earliest_date": "2027-Q2",
+      "binding": "binding",
+      "binding_evidence_quote": "De datum is bindend.",
+      "available_capacity_kw": 500,
+      "capacity_basis_quote": "Er is 500 kW beschikbaar voor teruglevering.",
+      "publication_date": null,
+      "publication_date_quote": null,
+      "confidence": 0.7
+    },
+    {
+      "document_id": "liander_amsterdam",
+      "verbatim_quote": "Capaciteit voor teruglevering komt terug in 2027.",
+      "page_or_row": null,
+      "congestion_registered": true,
+      "queue_status": "WAITLIST",
+      "indicative_earliest_date": "2027",
+      "binding": "non_binding",
+      "binding_evidence_quote": null,
+      "available_capacity_kw": null,
+      "capacity_basis_quote": null,
+      "publication_date": null,
+      "publication_date_quote": null,
+      "confidence": 0.6
+    }
+  ],
+  "options": [
+    {
+      "kind": "congestion_management_participation",
+      "document_id": "liander_amsterdam",
+      "route_quote": "Wie op de wachtlijst staat, kan zich aanmelden voor congestiemanagement via het klantportaal.",
+      "estimated_kw_enabled": null,
+      "kw_quote": null,
+      "confidence": 0.7
+    },
+    {
+      "kind": "non_firm_connection",
+      "document_id": "liander_amsterdam",
+      "route_quote": "Een niet-firma aansluiting kan direct worden aangevraagd via het klantportaal.",
+      "estimated_kw_enabled": 100,
+      "kw_quote": null,
+      "confidence": 0.5
+    }
+  ]
+}

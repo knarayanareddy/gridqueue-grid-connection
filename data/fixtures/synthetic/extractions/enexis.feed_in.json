@@ -1,0 +1,47 @@
+{
+  "_synthetic": true,
+  "_note": "Hand-written stand-in for Nemotron Ultra output. Well-behaved: every quote is verbatim.",
+  "claims": [
+    {
+      "document_id": "enexis_eindhoven",
+      "verbatim_quote": "De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.",
+      "page_or_row": null,
+      "congestion_registered": true,
+      "queue_status": "WAITLIST",
+      "indicative_earliest_date": "2028-Q3",
+      "binding": "non_binding",
+      "binding_evidence_quote": "Deze codeerprognose is indicatief en niet bindend; de datum kan wijzigen.",
+      "available_capacity_kw": null,
+      "capacity_basis_quote": null,
+      "publication_date": "2026-07-14",
+      "publication_date_quote": "Versie 3, gepubliceerd op 14 juli 2026.",
+      "confidence": 0.86
+    }
+  ],
+  "options": [
+    {
+      "kind": "congestion_management_participation",
+      "document_id": "enexis_eindhoven",
+      "route_quote": "Deelname aan congestiemanagement staat open voor aansluitingen vanaf 60 kW; aanmelden gaat via de congestiemanagementregeling op de website van de netbeheerder.",
+      "estimated_kw_enabled": null,
+      "kw_quote": null,
+      "confidence": 0.7
+    },
+    {
+      "kind": "non_firm_connection",
+      "document_id": "enexis_eindhoven",
+      "route_quote": "Een niet-firm transportrecht met een curtailmentregeling kunt u aanvragen via het aanvraagformulier grootzakelijke aansluitingen; hiermee is tot 60 kW teruglevering mogelijk.",
+      "estimated_kw_enabled": 60,
+      "kw_quote": "hiermee is tot 60 kW teruglevering mogelijk.",
+      "confidence": 0.8
+    },
+    {
+      "kind": "flex_transport_agreement",
+      "document_id": "enexis_eindhoven",
+      "route_quote": "Een flexcontract (transportovereenkomst op maat) kunt u bespreken met uw accountmanager grootzakelijk.",
+      "estimated_kw_enabled": null,
+      "kw_quote": null,
+      "confidence": 0.65
+    }
+  ]
+}

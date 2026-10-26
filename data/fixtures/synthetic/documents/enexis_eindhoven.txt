@@ -1,0 +1,22 @@
+SYNTHETISCH TESTDOCUMENT — GEEN PUBLICATIE VAN ENEXIS NETBEHEER.
+Dit bestand is geschreven door het GridQueue-project om de pijplijn zonder netwerk te testen. Alle gebieden, cijfers en data zijn verzonnen.
+
+Netcapaciteit en codeerprognose regio Eindhoven (synthetisch voorbeeld)
+Versie 3, gepubliceerd op 14 juli 2026.
+
+Teruglevering
+Voor teruglevering is in de regio Eindhoven congestie geregistreerd. Nieuwe aanvragen voor terugleverings-
+capaciteit komen op de wachtlijst.
+De indicatieve datum waarop weer productiecapaciteit beschikbaar komt is het derde kwartaal van 2028.
+Deze codeerprognose is indicatief en niet bindend; de datum kan wijzigen.
+
+Afname
+Voor afname is in de regio Eindhoven geen congestie geregistreerd. Per nieuwe aansluiting is maximaal
+250 kW afnamecapaciteit beschikbaar.
+
+Mogelijkheden bij congestie
+Een niet-firm transportrecht met een curtailmentregeling kunt u aanvragen via het aanvraagformulier
+grootzakelijke aansluitingen; hiermee is tot 60 kW teruglevering mogelijk.
+Deelname aan congestiemanagement staat open voor aansluitingen vanaf 60 kW; aanmelden gaat via de
+congestiemanagementregeling op de website van de netbeheerder.
+Een flexcontract (transportovereenkomst op maat) kunt u bespreken met uw accountmanager grootzakelijk.

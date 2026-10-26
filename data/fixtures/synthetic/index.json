@@ -1,0 +1,43 @@
+{
+  "_synthetic": true,
+  "_note": "SYNTHETIC fixtures written by the GridQueue project for offline runs. Not publications of any grid operator. See README.md.",
+  "scenarios": {
+    "Enexis": {
+      "documents": [
+        {
+          "fixture_key": "enexis_eindhoven",
+          "text_file": "documents/enexis_eindhoven.txt",
+          "family_id": "dso_codeerprognose",
+          "publisher": "SYNTHETIC FIXTURE — not published by Enexis",
+          "title": "SYNTHETISCH — Netcapaciteit en codeerprognose regio Eindhoven",
+          "url": "https://example.invalid/synthetic/enexis-eindhoven"
+        }
+      ],
+      "extractions": {
+        "feed_in": "extractions/enexis.feed_in.json",
+        "consumption": "extractions/enexis.consumption.json"
+      }
+    },
+    "Liander": {
+      "documents": [
+        {
+          "fixture_key": "liander_amsterdam",
+          "text_file": "documents/liander_amsterdam.txt",
+          "family_id": "dso_congestion_register",
+          "publisher": "SYNTHETIC FIXTURE — not published by Liander",
+          "title": "SYNTHETISCH — Congestieoverzicht regio Amsterdam",
+          "url": "https://example.invalid/synthetic/liander-amsterdam"
+        }
+      ],
+      "extractions": {
+        "feed_in": "extractions/liander.feed_in.adversarial.json",
+        "consumption": "extractions/liander.consumption.json"
+      }
+    },
+    "Stedin": {
+      "_scenario": "No document retrievable for this operator.",
+      "documents": [],
+      "extractions": {}
+    }
+  }
+}
