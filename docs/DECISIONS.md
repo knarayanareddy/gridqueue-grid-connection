@@ -129,3 +129,32 @@ that quote. The pack can then show where the figure came from.
 **D-019 · A/B results are committed and served read-only.**
 `make ab` writes `runs/ab_experiment_results.json`. `GET /v1/ab-results` serves it (404 with the command to run
 if it is missing). A test fails if the committed file differs from a fresh run (ignoring `generated_at`).
+
+## 2026-10-26 · C-T24-PACKAGE (50-area sweep, README metrics, video lock)
+
+**D-020 · The sweep is the API, 100 times.**
+Each area × direction calls `answer_query` (S1 → S5, gate on). The sweep copies values only from the gated answer
+and has no gate-off path. A failure in one area is caught, reported as `status: "failed"` with its error, and left
+out of every aggregate. It is counted in `n_failed` and never padded.
+
+**D-021 · Aggregate definitions.**
+- `no_firm_capacity` = verdict WAITLIST_ONLY, NON_FIRM_ONLY or NO_FIRM_CAPACITY. Shares are given against both
+  "areas with an official position" and "completed areas", with the denominators.
+- Abstentions are never negatives.
+- Dates are statistics of published estimates, always with their binding counts.
+- Non-firm kW are per-area operator statements and are never summed.
+- Every summary number can be recomputed from the area rows, and a test does that.
+
+**D-022 · Area selection is a fixed rule.**
+Evenly spaced postcode4 values per mapped range, split as evenly as possible across ranges. It is reproducible,
+it does not look at congestion, and it is labelled `systematic_sample` (a new enum value). It is not a "commercial
+areas" list.
+
+**D-023 · Documentation numbers are tested.**
+`backend/tests/test_packaging.py` derives the README banner, the README A/B table, the LIMITATIONS figures and
+the sweep counts from `runs/*.json`. Re-running `make ab` or `make sweep` with different results breaks the build
+until the docs are updated.
+
+**D-024 · The video script is locked to what exists.**
+12 shots, exactly 170 s, ≤ 2.7 spoken words/s. The test fails if a numeral in the narration is not in the README
+or LIMITATIONS. Features that are not built are not shown; swaps need published evidence first.
