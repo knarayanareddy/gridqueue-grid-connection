@@ -1,1 +1,56 @@
-# Architectural Decision Record — GridQueue — Energy Grid Interconnection Navigator & Flex Planner\n\n| Date | Decision | Rationale | Alternatives Considered | Owner |\n|---|---|---|---|---|\n| 2026-10-26 | Repo bootstrap & contract freeze | Hackathon Phase 0 launch | None | Lead |\n
+# Decisions log
+
+Format: date · decision · why · consequences. Newest first.
+
+---
+
+## 2026-10-26 · Review fixes (repo review, Phase 0)
+
+**D-001 · Gate verdict semantics: FAIL vs UNDETERMINED.**
+`FAIL` = the evidence quote provably does not occur in the source (paraphrase or fabrication →
+`quote_not_found_in_document`). `UNDETERMINED` = insufficient evidence: missing quote, missing source, quote
+< 10 chars, unparseable date, or the quote exists but does not state the asserted date/kW
+(`date_not_in_quote`, `kw_without_quote`). *Why:* the v0 README promised "downgrade to UNDETERMINED" while the
+code returned FAIL for everything. This split keeps "the model made it up" distinguishable from "we can't
+confirm it". Both outcomes drop the value from the answer.
+
+**D-002 · Gate matching is case-sensitive and normalises only extraction artefacts.**
+Normalised: NFKC, whitespace and line breaks, soft hyphens, zero-width characters, curly quotes and dashes.
+A hyphen at a line break is accepted both joined and kept. *Why:* the v0 exact-substring check rejected
+real quotes that PDF extraction had wrapped across lines. Anything looser than this stops being "verbatim".
+
+**D-003 · Period expressions must be adjacent to a four-digit year.**
+"Q3 2028", "derde kwartaal van 2028" and "juli 2028" are accepted. A stray "Q3" elsewhere in the quote, "may"
+the verb, and two-digit years ("Q3 '28") are not. *Why:* false support for a date is the exact harm this
+product exists to prevent, so the gate errs towards UNDETERMINED.
+
+**D-004 · Schema v1.0.0 → v1.1.0, despite the "FROZEN after C-T09" note.**
+Changes are bug fixes, not new fields:
+- the `then` branches of GQ-DATE-01, GQ-BINDING-01, GQ-KW-01, self-reported RevisionEvent and
+  LocationResolution now require non-null strings (previously `"x": null` satisfied `required`)
+- an ISO-like partial-date `pattern` on indicative dates (free text was accepted despite the description)
+- Option `computed_profile` requires ≥1 assumption, and `model_estimate` requires the flag to be present
+- `LedgerLine` and `Citation` were `$ref`s into `../../A-redflag-eu-product-safety/...`, which doesn't exist in
+  this repo. They are now defined locally, from docs/PLATFORM-CAPABILITIES.md and SPEC C-T12.
+
+**D-005 · Settings: no fake default API key.**
+`nebius_api_key` defaults to `None` (was `"mock-key"`), and settings are read by pydantic-settings from the env
+or `<repo>/.env`. Code must check `settings.has_nebius_key` and fall back to offline replay. *Why:* a fake key
+turns "not configured" into a confusing 401 at runtime.
+
+**D-006 · Ledger location is configurable (`RUNS_DIR`).**
+v0 derived the path from the module's position on disk. Installed into site-packages (the Docker image), that
+pointed inside the Python install. The jobs image sets `RUNS_DIR=/data/runs`.
+
+**D-007 · README states build status explicitly; unsourced numbers removed.**
+"Over 9,000 businesses waitlisted", "50 postal-code areas mapped" and "0 hallucinated dates" had no source or
+measurement. Text copied from other project ideas (marketplace delisting orders, electronics rework,
+solder boards) is removed. The headline number slot is reserved for the C-T23 A/B result.
+
+**D-008 · CI workflow stays in `docs/ci/` until a maintainer enables it.**
+The push token lacks the `workflow` scope. The CI badge is removed until the workflow exists, so it doesn't
+show a broken badge. See docs/ci/README.md.
+
+**D-009 · Explicit ruff rule selection.**
+ruff 0.17 changed its default rule set. The rules are pinned in `backend/pyproject.toml` so `make check`
+doesn't change meaning with the installed version.

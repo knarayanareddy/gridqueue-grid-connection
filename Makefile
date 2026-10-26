@@ -1,29 +1,50 @@
 # Makefile for gridqueue-grid-connection
+# Requires uv (https://docs.astral.sh/uv/): curl -LsSf https://astral.sh/uv/install.sh | sh
 
-.PHONY: help sample check test demo lint format clean
+UV ?= uv
+BACKEND := backend
+
+.PHONY: help sample check test lint format typecheck api clean require-uv
 
 help:
 	@echo "Available commands:"
-	@echo "  make sample   - Run pipeline offline on golden fixtures with uv"
-	@echo "  make check    - Run linting, typechecking, and schema validation tests"
-	@echo "  make test     - Run full pytest test suite"
-	@echo "  make demo     - Run end-to-end demo (requires NEBIUS_API_KEY)"
-	@echo "  make clean    - Remove virtualenvs, caches, and build artifacts"
+	@echo "  make sample    - Offline, no API key: run the deterministic gate + schema contract tests"
+	@echo "  make check     - Lint, typecheck and run the full test suite (what CI runs)"
+	@echo "  make test      - Run the full pytest suite"
+	@echo "  make lint      - ruff lint + format check"
+	@echo "  make format    - Apply ruff formatting and safe fixes"
+	@echo "  make typecheck - mypy over backend/app"
+	@echo "  make api       - Start the FastAPI server on 0.0.0.0:8000"
+	@echo "  make clean     - Remove virtualenvs, caches and build artifacts"
 
-sample:
-	cd backend && uv run --extra dev pytest tests/test_schemas.py -v
+require-uv:
+	@command -v $(UV) >/dev/null 2>&1 || { echo "uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
 
-check:
-	cd backend && uv run --extra dev pytest -v
+# NOTE: the full offline pipeline replay (one committed fixture query end to end, SPEC ticket C-T01) does not
+# exist yet. Until it does, `make sample` exercises the parts that are built: the gate and the contracts.
+sample: require-uv
+	cd $(BACKEND) && $(UV) run --extra dev pytest tests/test_gate.py tests/test_schemas.py -v
 
-test:
-	cd backend && uv run --extra dev pytest tests/ -v
+check: lint typecheck test
 
-demo:
-	cd backend && uv run python -m app.main
+test: require-uv
+	cd $(BACKEND) && $(UV) run --extra dev pytest -v
+
+lint: require-uv
+	cd $(BACKEND) && $(UV) run --extra dev ruff check . && $(UV) run --extra dev ruff format --check .
+
+format: require-uv
+	cd $(BACKEND) && $(UV) run --extra dev ruff check --fix . && $(UV) run --extra dev ruff format .
+
+typecheck: require-uv
+	cd $(BACKEND) && $(UV) run --extra dev mypy
+
+api: require-uv
+	cd $(BACKEND) && $(UV) run gridqueue-api
 
 clean:
-	find . -type d -name "__pycache__" -exec rm -rf {} +
-	find . -type d -name ".pytest_cache" -exec rm -rf {} +
-	find . -type d -name ".ruff_cache" -exec rm -rf {} +
-	rm -rf backend/.venv frontend/node_modules
+	find . -type d -name "__pycache__" -prune -exec rm -rf {} +
+	find . -type d -name ".pytest_cache" -prune -exec rm -rf {} +
+	find . -type d -name ".ruff_cache" -prune -exec rm -rf {} +
+	find . -type d -name ".mypy_cache" -prune -exec rm -rf {} +
+	rm -rf $(BACKEND)/.venv frontend/node_modules

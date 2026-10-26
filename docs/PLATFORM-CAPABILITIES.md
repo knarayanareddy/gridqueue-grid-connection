@@ -252,8 +252,8 @@ Keeping one stack across ideas lets shared docs apply and reduces agent failure 
 ```
 <project>/
 ├── LICENSE                        ← Apache-2.0, AT REPO ROOT, visible on the repo page
-├── README.md                      ← see _shared/templates/README.template.md
-├── LIMITATIONS.md                 ← see _shared/templates/LIMITATIONS.template.md
+├── README.md                      ← see docs/templates/README.template.md
+├── LIMITATIONS.md                 ← see docs/templates/LIMITATIONS.template.md
 ├── ARCHITECTURE.md
 ├── .env.example                   ← NEVER commit .env
 ├── .github/workflows/ci.yml
