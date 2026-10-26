@@ -1,0 +1,21 @@
+/* GridQueue Design System — Grid Utility Modern */
+:root {
+  --color-bg-primary: #0A0F1D;
+  --color-bg-secondary: #111A2E;
+  --color-bg-card: #18243E;
+  --color-text-primary: #F8FAFC;
+  --color-text-secondary: #94A3B8;
+  --color-text-muted: #64748B;
+  --color-border: #1E293B;
+
+  /* Grid & Energy Accents */
+  --color-congested: #F97316;   /* Congestion Amber */
+  --color-critical: #EF4444;    /* Full Lock Red */
+  --color-available: #10B981;   /* Available Capacity Mint */
+  --color-grid-blue: #3B82F6;   /* Substation Electric Blue */
+  --color-nvidia: #76B900;      /* NVIDIA Green */
+
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+}

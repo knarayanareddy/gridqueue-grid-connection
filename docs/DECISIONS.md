@@ -1,0 +1,1 @@
+# Architectural Decision Record — GridQueue — Energy Grid Interconnection Navigator & Flex Planner\n\n| Date | Decision | Rationale | Alternatives Considered | Owner |\n|---|---|---|---|---|\n| 2026-10-26 | Repo bootstrap & contract freeze | Hackathon Phase 0 launch | None | Lead |\n

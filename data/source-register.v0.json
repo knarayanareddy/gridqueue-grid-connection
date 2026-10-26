@@ -1,0 +1,181 @@
+{
+  "_meta": {
+    "schema_version": "0.1.0",
+    "project": "GridQueue — source register",
+    "generated": "2026-10-26",
+    "status": "TEMPLATE — every url below is a PLACEHOLDER CANDIDATE. None has been verified.",
+    "integrity_warnings": [
+      "Government and grid-operator publication URLs change constantly and are frequently restructured without redirects. DO NOT trust any URL in this file. Discover the current URL at build time (ticket C-T03), verify it resolves, record its sha256, and store the retrieval timestamp.",
+      "Never hard-code a URL from memory or from an LLM's answer. The retrieval layer must re-discover at runtime via Tavily and validate before ingesting.",
+      "Most of these documents are Dutch. Preserve original-language quotes verbatim and provide your own translation alongside, marked as yours. Never present a translation as a quotation.",
+      "Check the licence/publication terms of each source before redistributing extracted text in an Apache-2.0 repo. Dutch government publications are frequently CC0 or under a public-data licence, but DSO and TenneT publications may have their own terms — record what you find in docs/DATA-SOURCES.md.",
+      "Grid-operator names, logos and letterheads must NOT be reproduced as branding in the UI or video. Naming them in a text citation is fine and necessary; using their logo is not."
+    ],
+    "required_document_set": {
+      "minimum_total": 8,
+      "must_include": ["at least one DSO congestion register", "at least one DSO indicative forecast (codeerprognose)", "the national transmission-level congestion position", "at least one national regulator decision on the congestion-management framework", "at least one national or sector overview of where congestion exists"],
+      "target_total": 40,
+      "target_coverage": "every DSO in NL, plus at least one non-Dutch region as a stretch"
+    }
+  },
+
+  "document_families": [
+
+    {
+      "family_id": "dso_congestion_register",
+      "role": "PRIMARY — establishes whether congestion is registered for an area, and in which direction",
+      "why_it_matters": "This is the authoritative statement of 'is there capacity here, in this direction'. Everything downstream depends on it.",
+      "expected_publishers": ["the four/five Dutch distribution system operators (DSOs / netbeheerders)"],
+      "candidate_urls": ["TODO_DISCOVER — search: '<DSO name> congestieregister 2026', '<DSO name> netcongestie kaart'", "TODO_DISCOVER — the sector portal that aggregates DSO congestion information"],
+      "discovery_queries_nl": ["congestieregister netbeheerder 2026", "netcongestie kaart postcode", "waar is congestie op het elektriciteitsnet"],
+      "discovery_queries_en": ["distribution grid congestion register Netherlands", "electricity grid capacity map Netherlands by postcode"],
+      "expected_format": ["html", "pdf", "xlsx", "geojson"],
+      "expected_fields": ["area or postcode range", "direction (feed-in / production vs consumption / afname)", "status (open, closed, waitlist)", "available capacity in kW or MW", "publication date", "effective date"],
+      "direction_is_split_here": true,
+      "ttl_days": 60,
+      "extraction_difficulty": "MEDIUM–HIGH — frequently a map or a spreadsheet rather than text; may require XLSX or GeoJSON parsing rather than PDF extraction",
+      "notes": "Start with the operator for your own region (Brabant/Eindhoven). Getting one operator end-to-end is worth more than five half-ingested."
+    },
+
+    {
+      "family_id": "dso_codeerprognose",
+      "role": "PRIMARY — the indicative, explicitly NON-BINDING forecast of when capacity returns",
+      "why_it_matters": "This is the document everyone wants and everyone misreads. It contains the date, and it contains the language saying the date is not a promise.",
+      "expected_publishers": ["DSOs", "sometimes jointly, sometimes per operator"],
+      "candidate_urls": ["TODO_DISCOVER — search: 'codeerprognose <DSO name>', 'prognose netcongestie', 'verwachting capaciteit teruglevering'"],
+      "discovery_queries_nl": ["codeerprognose netbeheerder", "prognose wanneer komt er capaciteit terug", "indicatieve planning netverzwaring congestiegebied"],
+      "expected_format": ["pdf", "html"],
+      "expected_fields": ["area", "direction", "indicative date or period", "granularity (year/quarter/month)", "binding status language", "version number", "revision date", "previous indication (sometimes stated)"],
+      "direction_is_split_here": true,
+      "ttl_days": 30,
+      "extraction_difficulty": "MEDIUM — the date is usually explicit, but the BINDING LANGUAGE is the hard part",
+      "critical_extraction_note": "You MUST extract the document's own wording about binding status. Look for terms indicating non-binding/indicative/subject to change. If the document does not say, set binding='unknown' — NEVER default to 'binding'. This single rule is insight #2 and the reason the gate exists.",
+      "revision_tracking": "HIGH PRIORITY — extract any self-reported version history (v2 → v3, previous indication X → now Y). These become RevisionEvents with source='document_self_reported' and are publishable on day one."
+    },
+
+    {
+      "family_id": "national_tso_congestion_position",
+      "role": "CONTEXT — the national transmission-level picture",
+      "why_it_matters": "Explains why the local answer is what it is, and provides the national numbers for the Impact story",
+      "expected_publishers": ["the national transmission system operator"],
+      "candidate_urls": ["TODO_DISCOVER — search: 'landelijke netcongestie', 'congestieanalyse', 'grid congestion national report Netherlands'"],
+      "discovery_queries_nl": ["landelijke congestieanalyse elektriciteit", "netcongestie Nederland cijfers 2026", "wachtlijst aansluiting landelijk"],
+      "expected_format": ["pdf", "html"],
+      "expected_fields": ["national totals", "regional breakdown", "number of sites waiting", "MW requested vs available", "infrastructure investment plan dates"],
+      "ttl_days": 180,
+      "extraction_difficulty": "LOW–MEDIUM — usually a well-structured report"
+    },
+
+    {
+      "family_id": "regulator_congestion_management_framework",
+      "role": "RULES — what operators are allowed to offer, and what a requester is entitled to",
+      "why_it_matters": "This is where the non-firm connection, flexibility arrangements and congestion-management participation come from. Insight #3's legal basis.",
+      "expected_publishers": ["the national competition/energy regulator"],
+      "candidate_urls": ["TODO_DISCOVER — search: '<regulator> besluit congestiemanagement', 'kader congestiemanagement', 'besluit niet-firma aansluiting'"],
+      "discovery_queries_nl": ["besluit congestiemanagement toezichthouder", "regels niet-firma transportovereenkomst", "flexcontract netcongestie regelgeving", "curtailment afnamebeperking voorwaarden"],
+      "expected_format": ["pdf", "html"],
+      "expected_fields": ["definitions of firm and non-firm capacity", "curtailment rules", "congestion-management framework obligations", "what operators must offer when congested", "queue/allocation rules"],
+      "ttl_days": 365,
+      "extraction_difficulty": "HIGH — legal text, dense, and the definitions matter precisely",
+      "notes": "Cache this heavily: it changes slowly but it is referenced by every single answer. This is the biggest cached-token win in the project."
+    },
+
+    {
+      "family_id": "sector_congestion_overview",
+      "role": "COVERAGE — an aggregated view of which areas are congested",
+      "why_it_matters": "Fast way to seed the sweep's area selection and to cross-check a single operator's register",
+      "candidate_urls": ["TODO_DISCOVER — search: 'netcongestie overzicht alle netbeheerders', sector association congestion page"],
+      "expected_format": ["html", "xlsx", "geojson"],
+      "ttl_days": 60,
+      "extraction_difficulty": "MEDIUM"
+    },
+
+    {
+      "family_id": "dso_connection_application_process",
+      "role": "ACTION — how to actually apply, per operator",
+      "why_it_matters": "Every ranked Option needs a real application_route with a citation. This is where those come from.",
+      "candidate_urls": ["TODO_DISCOVER per operator — search: '<DSO name> aansluiting aanvragen zakelijk', '<DSO name> transportovereenkomst', '<DSO name> flexcontract aanvragen'"],
+      "expected_fields": ["application steps", "required documents", "lead times", "contact details", "forms", "whether a flex/non-firm route exists"],
+      "ttl_days": 90,
+      "extraction_difficulty": "LOW–MEDIUM",
+      "notes": "Also harvest the exact phone numbers and contact forms for the phone_script feature (GQ-NOPOSITION-01). A real, correct contact route is the most useful thing this tool can hand someone."
+    },
+
+    {
+      "family_id": "government_electrification_subsidy_and_guidance",
+      "role": "CONTEXT — schemes that change the economics of the options",
+      "why_it_matters": "An option that says 'you can get subsidy for a battery that limits your export' is worth ten times more than one that doesn't",
+      "candidate_urls": ["TODO_DISCOVER — search for national electrification/solar/battery subsidy guidance and municipal/regional energy-loket pages"],
+      "ttl_days": 180,
+      "extraction_difficulty": "LOW"
+    },
+
+    {
+      "family_id": "open_postcode_geo_reference",
+      "role": "GEO — the deterministic postcode → gemeente → province mapping for S1",
+      "why_it_matters": "S1 must be a lookup, not a model guess. A wrong operator silently invalidates everything.",
+      "candidate_urls": ["TODO_DISCOVER — national open postcode/gemeente datasets", "TODO_DISCOVER — each operator's published service-area list"],
+      "expected_format": ["csv", "geojson", "xlsx"],
+      "ttl_days": 365,
+      "extraction_difficulty": "LOW",
+      "notes": "Four-digit postcode granularity is sufficient. Verify ≥20 rows by hand against a second source."
+    },
+
+    {
+      "family_id": "non_dutch_comparison_region",
+      "role": "STRETCH — one non-Dutch region to prove the pipeline generalises",
+      "why_it_matters": "Converts 'a Dutch tool' into 'a generalisable pipeline' without extra build",
+      "candidate_urls": ["TODO_DISCOVER — a German Netzbetreiber congestion/net-expansion page, an Irish or UK DSO constraint register, or a US interconnection-queue dataset"],
+      "expected_fields": ["area", "status", "indicative date", "binding language"],
+      "ttl_days": 90,
+      "extraction_difficulty": "MEDIUM–HIGH (new language, new vocabulary)",
+      "notes": "ONLY after the Dutch demo is complete. A US interconnection-queue dataset is attractive because several are machine-readable and the queue-position concept maps cleanly — but the vocabulary differs (interconnection queue, cluster study, position number), so it needs its own lexicon entries."
+    }
+  ],
+
+  "corpus_index_contract": {
+    "table": "documents",
+    "columns": {
+      "document_id": "TEXT PRIMARY KEY — doc_<family_id>_<n>",
+      "family_id": "TEXT — from document_families above",
+      "publisher": "TEXT",
+      "title": "TEXT — original language",
+      "title_en": "TEXT NULL — our translation, marked as ours",
+      "url": "TEXT — the URL that actually resolved at retrieval time",
+      "publication_date": "DATE",
+      "retrieved_at": "TIMESTAMP",
+      "sha256": "TEXT",
+      "format": "TEXT — pdf|xlsx|html|xml|json|geojson",
+      "language": "TEXT — nl|en|de|…",
+      "licence": "TEXT — as found on the source; record 'unknown' honestly rather than assuming",
+      "redistributable": "BOOLEAN — whether extracted text may be committed to a public Apache-2.0 repo",
+      "extraction_method": "TEXT",
+      "pages_or_rows": "INTEGER",
+      "is_current": "BOOLEAN",
+      "superseded_by": "TEXT NULL",
+      "revision_of": "TEXT NULL",
+      "direction_split_available": "BOOLEAN — whether the document distinguishes feed-in from consumption",
+      "local_path": "TEXT — data/corpus/documents/… (may be gitignored for large files; extraction text is committed)"
+    }
+  },
+
+  "revision_event_contract": {
+    "file": "data/corpus/revisions.jsonl",
+    "fields": {
+      "id": "rev_…",
+      "document_family": "TEXT",
+      "source": "snapshot_comparison | document_self_reported",
+      "previous_sha256": "TEXT NULL",
+      "new_sha256": "TEXT NULL",
+      "previous_publication_date": "DATE NULL",
+      "new_publication_date": "DATE NULL",
+      "detected_at": "TIMESTAMP",
+      "what_changed": "TEXT NULL",
+      "indicative_date_before": "TEXT NULL — e.g. '2028-Q1'",
+      "indicative_date_after": "TEXT NULL — e.g. '2028-Q3'",
+      "quote_before": "TEXT NULL — verbatim, original language",
+      "quote_after": "TEXT NULL — verbatim, original language"
+    },
+    "honesty_rule": "document_self_reported revisions are extracted from the document's OWN stated version history and must carry quote_before/quote_after. Do not present them as revisions you tracked yourself. State in the README that live snapshot tracking began on <date>."
+  }
+}

@@ -1,0 +1,26 @@
+repo,url,language,stars,clusters,description
+Virta,https://github.com/apn201/Virta,Python,2,ENERGY/GRID/CLIMATE*,Nemotron reasoning on household power consumption
+rent-scanner-ai,https://github.com/Alortiztique/rent-scanner-ai,TypeScript,1,REAL-ESTATE/HOUSING*,The Open-Source Skyscanner for Cheap Urban Subleases & Anti-Gentrification Housing Intelligence (Nebius x NVIDIA Global AI Hackathon)
+Agric_orion,https://github.com/darish500/Agric_orion,Python,0,ENERGY/GRID/CLIMATE*,
+CONTRACTRISKMANAGER,https://github.com/GargiLaulkar/CONTRACTRISKMANAGER,Python,0,sre/incident;legal/contracts;REAL-ESTATE/HOUSING*,"AI contract risk analyzer: flags risky clauses in leases, NDAs and terms of service, explains them in plain English and suggests fairer wording. Multi-stage pipeline on NVIDIA Nemotron via Nebius Token Factory."
+Call-Flow,https://github.com/lethrelldouglas/Call-Flow,Python,0,voice/speech;legal/contracts;REAL-ESTATE/HOUSING*,"24/7 AI front desk for property managers: answers tenant calls, opens work orders, phones the right contractor, texts the tenant, and runs a live ops board. NVIDIA Nemotron on Nebius Token Factory, Retell, Twilio, Tavily."
+CivicClosure,https://github.com/ayushmanmehta-apurwa/CivicClosure,Python,0,GOV/CIVIC*,
+SWARMOS,https://github.com/bhavesh200628-debug/SWARMOS,Python,0,physical-ai/robotics;LOGISTICS/MOBILITY*,One nervous system for an entire robot fleet. Physical AI orchestration for heterogeneous AMRs on Nebius Token Factory & NVIDIA Nemotron.
+agent-joules,https://github.com/tomas-rampas/agent-joules,C#,0,ENERGY/GRID/CLIMATE*,"Agent Joules: energy per agent step, measured on your GPU"
+blackbox-council,https://github.com/tirth6851/blackbox-council,Python,0,coding-agent;security/guardrails;GOV/CIVIC*,An auditable pre-action policy gate that stress-tests AI-agent decisions before execution.
+bureaucracy-navigator,https://github.com/banksythequantLab/bureaucracy-navigator,Python,0,GOV/CIVIC*,"Government forms explained, filled, checked and tracked in your language. Nebius x NVIDIA hackathon entry (Nemotron + Tavily)."
+clusterdoctor,https://github.com/vishalbanwari26/clusterdoctor,Python,0,fact-check/verification;LOGISTICS/MOBILITY*,"Evidence-driven agentic root-cause analysis for AI inference and GPU fleets, on NVIDIA Nemotron via Nebius Token Factory"
+council-watch,https://github.com/Gooreum/council-watch,Python,0,GOV/CIVIC*,"Your city council's agenda, read for you. NVIDIA Nemotron on Nebius Token Factory + Tavily. Nebius x NVIDIA Global AI Hackathon."
+crossfarm,https://github.com/Gluflex/crossfarm,JavaScript,0,ENERGY/GRID/CLIMATE*,Find the farmers who already farm your field's future climate
+demeter,https://github.com/loveyadav1015/demeter,TypeScript,0,ENERGY/GRID/CLIMATE*;SMALL-BUSINESS/ECOM*,"Demeter turns messy WhatsApp tiffin orders into reliable packing sheets. AI proposes, the owner approves, code calculates, so no meal is wasted and no cancellation is missed."
+digital-queue-platform,https://github.com/thato899/digital-queue-platform,TypeScript,0,REAL-ESTATE/HOUSING*,"Multi-tenant digital queue, booking, and payment SaaS platform"
+learners-permit,https://github.com/thiagopari/learners-permit,Python,0,physical-ai/robotics;GOV/CIVIC*;agent-eval/benchmark,"Robots earn the right to be commanded by AI: GR00T skills licensed by Nebius evals, Cedar RBAC, Nemotron planner"
+nearmiss-nvidia-nebius,https://github.com/hudasol/nearmiss-nvidia-nebius,Python,0,physical-ai/robotics;LOGISTICS/MOBILITY*,A Physical AI safety experimentation platform for simulating warehouse near-misses and stress-testing safety interventions under changing physical conditions.
+nivaran,https://github.com/harshkawatra11/nivaran,TypeScript,0,legal/contracts;GOV/CIVIC*,"File once. Nivaran keeps the government's clock: Nemotron agents on Nebius Token Factory draft, review and legally escalate civic complaints."
+pham-canh,https://github.com/pham-canh/pham-canh,,0,voice/speech;LOGISTICS/MOBILITY*,"Building agent tooling and shipping the receipts: harness kits, voice agents, and the post-mortems nobody asked for"
+phantom-grid-nebius-nvidia,https://github.com/jackhu24-ship-it/phantom-grid-nebius-nvidia,Python,0,sre/incident;physical-ai/robotics;ENERGY/GRID/CLIMATE*,PHANToM GRID :: Autonomous Physical AI & Edge SRE Orchestrator (Nebius x NVIDIA Global AI Hackathon)
+sky-net,https://github.com/vectordyne-temp/sky-net,Python,0,coding-agent;physical-ai/robotics;LOGISTICS/MOBILITY*,"Clearance runtime for AI-operated drone fleets. Agents propose, the tower clears, only cleared flights move. Nemotron agents, deterministic judge, two-world conformance test."
+tenantwise,https://github.com/NabeelAhmedKab1r/tenantwise,TypeScript,0,REAL-ESTATE/HOUSING*,
+vf-logistics-nebius-nvidia,https://github.com/hoachauphuoc/vf-logistics-nebius-nvidia,Python,0,scam/fraud;LOGISTICS/MOBILITY*,Multi-agent AI fraud detection system for logistics - Nebius x NVIDIA Global AI Hackathon submission
+wattwise,https://github.com/ut1776/wattwise,Python,0,ENERGY/GRID/CLIMATE*,AI agent that reschedules GPU workloads to run when the grid is cleanest
+zero-out,https://github.com/MAXIMUSSCORP/zero-out,Python,0,voice/speech;LOGISTICS/MOBILITY*,Maps US toll-free phone menus so you can jump straight to the option you need. Local app: Parakeet ASR + Nemotron on Nebius Token Factory.

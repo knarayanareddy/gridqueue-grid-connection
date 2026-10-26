@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/gridqueue/schemas/core-schemas.json",
+  "title": "GridQueue core contracts",
+  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/app/models.py (Pydantic v2) and backend/tests/test_schemas.py.",
+  "schema_version": "1.0.0",
+
+  "$defs": {
+
+    "Direction": {"enum": ["feed_in", "consumption", "both"], "description": "INSIGHT #1. 'both' is valid only in the request; a PositionClaim and a DirectionResult must always resolve to one direction."},
+
+    "ConnectionItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "kw", "direction"],
+      "properties": {
+        "kind": {"enum": ["pv", "battery", "ev_charger", "heat_pump", "industrial_load", "storage_other", "other"]},
+        "kw": {"type": "number", "exclusiveMinimum": 0},
+        "kw_p": {"type": ["number", "null"], "description": "For PV: installed peak kWp, which differs from export kW"},
+        "direction": {"$ref": "#/$defs/Direction"},
+        "flexible": {"type": "boolean", "default": false},
+        "max_curtailable_kw": {"type": ["number", "null"], "minimum": 0},
+        "time_window": {"type": ["string", "null"], "description": "e.g. 'night-only charge', 'weekday 08:00-18:00'"},
+        "count": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+
+    "ConnectionRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "country", "requested", "asker_role"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^req_"},
+        "address_or_postcode": {"type": ["string", "null"]},
+        "postcode4": {"type": ["string", "null"], "pattern": "^[0-9]{4}$"},
+        "country": {"type": "string", "default": "NL"},
+        "requested": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/ConnectionItem"}},
+        "asker_role": {"enum": ["owner", "installer", "municipality", "housing_association", "developer", "other"]},
+        "connection_scale": {"enum": ["kleinverbruik", "grootverbruik", "unknown"], "default": "unknown"},
+        "budget_deadline": {"type": ["string", "null"], "format": "date"},
+        "notes": {"type": ["string", "null"]}
+      }
+    },
+
+    "LocationResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["resolved", "resolution_method", "resolved_at"],
+      "properties": {
+        "postcode": {"type": ["string", "null"]},
+        "postcode4": {"type": ["string", "null"]},
+        "gemeente": {"type": ["string", "null"]},
+        "provincie": {"type": ["string", "null"]},
+        "dso": {"type": ["string", "null"]},
+        "dso_evidence_citation": {"type": ["string", "null"], "pattern": "^cit_", "description": "LAW: a DSO assignment without a citation is a guess. resolved=true with dso_evidence_citation=null MUST fail validation."},
+        "tso_region": {"type": ["string", "null"]},
+        "congestion_area_ids": {"type": "array", "items": {"type": "string"}},
+        "resolution_method": {"enum": ["static_table", "api_lookup", "geojson_lookup"]},
+        "resolved": {"type": "boolean"},
+        "resolved_at": {"type": "string", "format": "date-time"},
+        "abstain_reason": {"enum": ["unmapped_postcode", "malformed_postcode", "outside_supported_country", "no_dso_mapping", "ambiguous_match", null]}
+      },
+      "allOf": [{"if": {"properties": {"resolved": {"const": true}}, "required": ["resolved"]}, "then": {"required": ["dso", "dso_evidence_citation"], "properties": {"dso": {"type": "string"}, "dso_evidence_citation": {"type": "string"}}}}]
+    },
+
+    "SourceDocument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "family_id", "publisher", "title", "url", "retrieved_at", "sha256", "format", "language", "licence", "is_current", "direction_split_available"],
+      "properties": {
+        "document_id": {"type": "string", "pattern": "^doc_"},
+        "family_id": {"enum": ["dso_congestion_register", "dso_codeerprognose", "national_tso_congestion_position", "regulator_congestion_management_framework", "sector_congestion_overview", "dso_connection_application_process", "government_electrification_subsidy_and_guidance", "open_postcode_geo_reference", "non_dutch_comparison_region"]},
+        "publisher": {"type": "string"},
+        "title": {"type": "string", "description": "Original language"},
+        "title_en": {"type": ["string", "null"], "description": "Our translation — must be marked as ours in the UI, never presented as the source title"},
+        "url": {"type": "string", "format": "uri"},
+        "publication_date": {"type": ["string", "null"], "format": "date"},
+        "retrieved_at": {"type": "string", "format": "date-time"},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "format": {"enum": ["pdf", "xlsx", "csv", "html", "xml", "json", "geojson"]},
+        "language": {"type": "string"},
+        "licence": {"type": "string", "description": "As found on the source. 'unknown' is an honest value; never assume permissive."},
+        "redistributable": {"type": ["boolean", "null"]},
+        "extraction_method": {"type": ["string", "null"]},
+        "pages_or_rows": {"type": ["integer", "null"]},
+        "is_current": {"type": "boolean"},
+        "superseded_by": {"type": ["string", "null"]},
+        "revision_of": {"type": ["string", "null"]},
+        "direction_split_available": {"type": "boolean", "description": "Whether the document distinguishes feed-in from consumption. A document without a direction split cannot support a direction-specific claim."},
+        "age_days_at_answer": {"type": ["integer", "null"], "description": "Computed at answer time; drives the GQ-TTL-01 staleness downgrade"},
+        "local_path": {"type": ["string", "null"]}
+      }
+    },
+
+    "RevisionEvent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "document_family", "source", "detected_at"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^rev_"},
+        "document_family": {"type": "string"},
+        "source": {"enum": ["snapshot_comparison", "document_self_reported"], "description": "HONESTY LAW: document_self_reported events are extracted from the document's OWN stated version history. They must carry quote_before and quote_after, and must never be presented as revisions we tracked ourselves."},
+        "previous_sha256": {"type": ["string", "null"]},
+        "new_sha256": {"type": ["string", "null"]},
+        "previous_publication_date": {"type": ["string", "null"], "format": "date"},
+        "new_publication_date": {"type": ["string", "null"], "format": "date"},
+        "detected_at": {"type": "string", "format": "date-time"},
+        "what_changed": {"type": ["string", "null"]},
+        "indicative_date_before": {"type": ["string", "null"]},
+        "indicative_date_after": {"type": ["string", "null"]},
+        "quote_before": {"type": ["string", "null"], "description": "Verbatim, original language"},
+        "quote_after": {"type": ["string", "null"], "description": "Verbatim, original language"},
+        "document_ids": {"type": "array", "items": {"type": "string", "pattern": "^doc_"}}
+      },
+      "allOf": [{"if": {"properties": {"source": {"const": "document_self_reported"}}, "required": ["source"]}, "then": {"required": ["quote_before", "quote_after"]}}]
+    },
+
+    "PositionClaim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "direction", "congestion_registered", "queue_status", "binding", "document_id", "verbatim_quote", "confidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^pc_"},
+        "congestion_area_id": {"type": ["string", "null"]},
+        "dso": {"type": ["string", "null"]},
+        "direction": {"enum": ["feed_in", "consumption"], "description": "LAW: 'both' is not a valid claim direction. A claim must be about one direction."},
+        "congestion_registered": {"enum": [true, false, "unknown"]},
+        "queue_status": {"enum": ["OPEN", "CLOSED", "WAITLIST", "CONDITIONAL", "UNKNOWN"]},
+        "indicative_earliest_date": {"type": ["string", "null"], "description": "e.g. '2028-Q3', '2028', '2028-07'. Normalise to ISO-like partial dates; never free text."},
+        "date_granularity": {"enum": ["year", "quarter", "month", "exact", "range", "none"]},
+        "binding": {"enum": ["binding", "non_binding", "unknown"], "description": "INSIGHT #2 / GQ-BINDING-01. MUST be extracted from the document's own wording. Never null, never defaulted to 'binding'."},
+        "binding_evidence_quote": {"type": ["string", "null"], "description": "The document's own words about binding status. Required when binding != 'unknown'."},
+        "non_binding_markers_found": {"type": "array", "items": {"type": "string"}, "description": "e.g. ['indicatief','onder voorbehoud'] — see domain-lexicon.md §3. Surfacing these is a trust feature."},
+        "available_capacity_kw": {"type": ["number", "null"], "minimum": 0},
+        "capacity_basis_quote": {"type": ["string", "null"], "description": "GQ-KW-01: required whenever available_capacity_kw is non-null"},
+        "document_id": {"type": "string", "pattern": "^doc_"},
+        "citation_id": {"type": ["string", "null"], "pattern": "^cit_"},
+        "verbatim_quote": {"type": "string", "minLength": 10, "description": "Must pass corpus.verbatim_supports(). A paraphrase is rejected in code and the claim dropped."},
+        "quote_language": {"type": "string", "default": "nl"},
+        "our_translation": {"type": ["string", "null"], "description": "Our translation, always labelled as ours"},
+        "page_or_row": {"type": ["string", "null"]},
+        "publication_date": {"type": ["string", "null"], "format": "date"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "downgrade_to_verify": {"type": "boolean", "default": false, "description": "GQ-TTL-01: set when the source document is stale"},
+        "ledger_id": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {"if": {"required": ["indicative_earliest_date"], "properties": {"indicative_earliest_date": {"type": "string"}}}, "then": {"required": ["document_id", "verbatim_quote", "publication_date"]}, "description": "GQ-DATE-01: no date without a document, a quote and a publication date."},
+        {"if": {"properties": {"binding": {"enum": ["binding", "non_binding"]}}}, "then": {"required": ["binding_evidence_quote"]}, "description": "GQ-BINDING-01: an asserted binding status needs the source's own words."},
+        {"if": {"properties": {"available_capacity_kw": {"type": "number"}}, "required": ["available_capacity_kw"]}, "then": {"required": ["capacity_basis_quote"]}, "description": "GQ-KW-01"}
+      ]
+    },
+
+    "Option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "estimate_basis", "application_route", "evidence_document_ids", "model_estimate_flag", "confidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^opt_"},
+        "kind": {"enum": ["non_firm_connection", "flex_transport_agreement", "congestion_management_participation", "time_shift_profile", "battery_with_export_limit", "collective_arrangement", "queue_registration", "reduce_requested_capacity", "phase_installation", "energy_hub_participation", "other"]},
+        "title": {"type": ["string", "null"]},
+        "estimated_kw_enabled": {"type": ["number", "null"], "minimum": 0},
+        "estimate_basis": {"enum": ["document_quote", "computed_profile", "model_estimate"], "description": "GQ-ESTIMATE-01: 'model_estimate' MUST set model_estimate_flag=true and MUST be visually flagged in the UI."},
+        "assumptions": {"type": "array", "items": {"type": "string"}, "description": "Required when estimate_basis='computed_profile'"},
+        "sensitivity_note": {"type": ["string", "null"], "description": "How the answer changes if an assumption is 20% worse"},
+        "prerequisites": {"type": "array", "items": {"type": "string"}},
+        "application_route": {"type": "string", "minLength": 5, "description": "GQ-ROUTE-01: a real route. An option without one is dropped by the gate."},
+        "who_to_contact": {"type": ["string", "null"]},
+        "contact_detail": {"type": ["string", "null"], "description": "Verified phone/form/email from dso_connection_application_process"},
+        "expected_lead_time": {"type": ["string", "null"]},
+        "evidence_document_ids": {"type": "array", "minItems": 1, "items": {"type": "string", "pattern": "^doc_"}},
+        "citation_ids": {"type": "array", "items": {"type": "string", "pattern": "^cit_"}},
+        "rank": {"type": ["integer", "null"], "minimum": 1},
+        "rank_rationale": {"type": ["string", "null"]},
+        "model_estimate_flag": {"type": "boolean"},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+      },
+      "allOf": [{"if": {"properties": {"estimate_basis": {"const": "model_estimate"}}}, "then": {"properties": {"model_estimate_flag": {"const": true}}}}]
+    },
+
+    "LoadProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["request_id", "resolution_minutes", "series", "computed_profile_flag", "assumptions"],
+      "description": "C-T30. Deterministic, NO LLM. The difference between 'you could get a flex contract' and 'a 12 kW curtailment cap covers 44 of your 60 kW, and here is the profile that shows it.'",
+      "properties": {
+        "request_id": {"type": "string"},
+        "resolution_minutes": {"type": "integer", "const": 30},
+        "horizon_days": {"type": "integer"},
+        "day_types": {"type": "array", "items": {"enum": ["weekday", "saturday", "sunday"]}},
+        "series": {"type": "array", "items": {"type": "object", "required": ["day_type", "slot_index", "consumption_kw", "feed_in_kw"], "properties": {"day_type": {"enum": ["weekday", "saturday", "sunday"]}, "slot_index": {"type": "integer", "minimum": 0, "maximum": 47}, "consumption_kw": {"type": "number"}, "feed_in_kw": {"type": "number"}, "curtailable_kw": {"type": "number"}, "components": {"type": "object"}}}},
+        "peak_consumption_kw": {"type": "number"},
+        "peak_feed_in_kw": {"type": "number"},
+        "curtailable_share": {"type": "number", "minimum": 0, "maximum": 1},
+        "min_curtailment_cap_kw_for_request": {"type": ["number", "null"], "description": "The smallest non-firm cap that still covers the whole request, computed from the profile"},
+        "computed_profile_flag": {"type": "boolean", "const": true},
+        "assumptions": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "pv_curve_source": {"type": ["string", "null"]},
+        "never_llm_generated": {"type": "boolean", "const": true}
+      }
+    },
+
+    "PhoneScript": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dso", "direction", "text_nl", "text_en", "rule_id"],
+      "description": "GQ-NOPOSITION-01. The most useful thing this tool hands a real user. Must be in correct Dutch, verified by a native speaker, using the operator's own vocabulary.",
+      "properties": {
+        "dso": {"type": "string"},
+        "direction": {"enum": ["feed_in", "consumption", "both"]},
+        "asker_role": {"enum": ["owner", "installer", "municipality", "other"]},
+        "text_nl": {"type": "string", "minLength": 40},
+        "text_en": {"type": "string", "minLength": 40},
+        "rule_id": {"type": "string", "pattern": "^GQ-"},
+        "contact_route": {"type": ["string", "null"]},
+        "native_speaker_verified_by": {"type": ["string", "null"], "description": "Name of the person who checked the Dutch. Required before shipping."}
+      }
+    },
+
+    "DirectionResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["direction", "verdict", "headline"],
+      "properties": {
+        "direction": {"enum": ["feed_in", "consumption"]},
+        "verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED"]},
+        "headline": {"type": "string", "description": "One sentence, above the fold, on the DirectionCard"},
+        "position_claim": {"oneOf": [{"$ref": "#/$defs/PositionClaim"}, {"type": "null"}]},
+        "binding_chip": {"enum": ["BINDING", "NON_BINDING", "UNKNOWN", "NOT_APPLICABLE"], "description": "The three states must be distinguishable in greyscale and under deuteranopia simulation — C-T07/C-T34."},
+        "available_capacity_kw": {"type": ["number", "null"]},
+        "indicative_earliest_date": {"type": ["string", "null"]},
+        "revision_history": {"type": "array", "items": {"$ref": "#/$defs/RevisionEvent"}},
+        "gate_report": {"type": ["string", "null"], "pattern": "^gate_"},
+        "abstentions": {"type": "array", "items": {"$ref": "#/$defs/Abstention"}},
+        "phone_script": {"oneOf": [{"$ref": "#/$defs/PhoneScript"}, {"type": "null"}]},
+        "options_for_this_direction": {"type": "array", "items": {"type": "string", "pattern": "^opt_"}}
+      }
+    },
+
+    "Abstention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reason", "message", "fix_instruction"],
+      "properties": {
+        "reason": {"enum": ["unmapped_postcode", "outside_supported_country", "no_position_found", "document_stale", "document_truncated", "tavily_unavailable", "publisher_unreachable", "budget_exceeded", "quote_not_found_in_document", "date_without_document", "kw_without_quote", "option_without_route", "direction_not_covered_by_source"]},
+        "scope": {"enum": ["answer", "direction", "claim", "option"]},
+        "message": {"type": "string"},
+        "fix_instruction": {"type": "string", "description": "REQUIRED and concrete. Usually the Dutch phone script. An abstention without a next action is a dead end."},
+        "document_id": {"type": ["string", "null"]},
+        "observed_values": {"type": ["object", "null"]}
+      }
+    },
+
+    "Answer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["answer_id", "request", "location", "per_direction", "options_ranked", "gate", "corpus_snapshot_id", "cost", "timings_ms", "generated_at", "disclaimer"],
+      "properties": {
+        "answer_id": {"type": "string", "pattern": "^ans_"},
+        "request": {"$ref": "#/$defs/ConnectionRequest"},
+        "location": {"$ref": "#/$defs/LocationResolution"},
+        "per_direction": {"type": "array", "minItems": 1, "maxItems": 2, "items": {"$ref": "#/$defs/DirectionResult"}},
+        "load_profile": {"oneOf": [{"$ref": "#/$defs/LoadProfile"}, {"type": "null"}]},
+        "options_ranked": {"type": "array", "items": {"$ref": "#/$defs/Option"}},
+        "action_first": {"type": "object", "required": ["primary"], "properties": {"primary": {"type": "string", "description": "One sentence: the single most useful next action"}, "phone_script": {"oneOf": [{"$ref": "#/$defs/PhoneScript"}, {"type": "null"}]}, "copy_targets": {"type": "array", "items": {"type": "string"}}}},
+        "documents_cited": {"type": "array", "minItems": 0, "items": {"type": "string", "pattern": "^doc_"}},
+        "artifact": {"type": ["object", "null"], "additionalProperties": false, "properties": {"sha256": {"type": "string"}, "bytes": {"type": "integer"}, "sandbox_image_uuid": {"type": "string"}, "sandbox_operation_id": {"type": "string"}, "generated_in_sandbox": {"type": "boolean", "const": true}, "network_disabled_during_validation": {"type": "boolean", "const": true}, "validation_report": {"type": "object"}, "local_path": {"type": "string"}}},
+        "gate": {"type": "object", "additionalProperties": false, "required": ["checks_run", "checks_passed", "rejected_claims", "abstentions", "determinism_hash"], "properties": {"checks_run": {"type": "integer"}, "checks_passed": {"type": "integer"}, "rejected_claims": {"type": "array", "items": {"type": "object", "required": ["claim", "reason"], "properties": {"claim": {"type": "string"}, "reason": {"enum": ["date_without_document", "quote_not_found_in_document", "document_stale", "document_truncated", "kw_without_quote", "binding_not_stated", "option_without_route", "option_cites_missing_document", "direction_conflated", "non_binding_marker_unlabelled"]}, "document_id": {"type": ["string", "null"]}}}}, "abstentions": {"type": "array", "items": {"$ref": "#/$defs/Abstention"}}, "dates_surviving": {"type": "integer"}, "dates_dropped": {"type": "integer"}, "determinism_hash": {"type": "string"}, "llm_calls_in_gate": {"type": "integer", "const": 0}}},
+        "corpus_snapshot_id": {"type": "string", "description": "Ties the answer to an exact corpus state. Answers are reproducible against a snapshot; without this the demo cannot be re-verified."},
+        "currency_check": {"type": ["object", "null"], "properties": {"performed_at": {"type": "string"}, "tavily_calls": {"type": "integer"}, "newer_versions_found": {"type": "integer"}, "status": {"enum": ["current", "newer_version_exists", "unavailable"]}}},
+        "cost": {"type": "object", "required": ["total_usd", "by_model"], "properties": {"total_usd": {"type": "number"}, "by_model": {"type": "object", "additionalProperties": {"type": "number"}}, "text_tokens": {"type": "integer"}, "cached_tokens": {"type": "integer"}, "cached_token_savings_usd": {"type": "number"}, "tavily_calls": {"type": "integer"}, "tavily_usd": {"type": "number"}, "cache_hit": {"type": "boolean"}}},
+        "timings_ms": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "disclaimer": {"type": "string"}
+      }
+    },
+
+    "SweepArea": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["postcode4", "dso", "selected_by", "corpus_snapshot_id"],
+      "properties": {
+        "postcode4": {"type": "string"},
+        "gemeente": {"type": ["string", "null"]},
+        "provincie": {"type": ["string", "null"]},
+        "dso": {"type": "string"},
+        "congestion_area_id": {"type": ["string", "null"]},
+        "selected_by": {"enum": ["registered_congestion", "control_sample", "manual"], "description": "METHODOLOGY LAW: a sweep containing only congested areas is cherry-picking. Include a control sample and label which is which."},
+        "feed_in_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
+        "consumption_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
+        "indicative_date": {"type": ["string", "null"]},
+        "binding": {"enum": ["binding", "non_binding", "unknown", "not_applicable", null]},
+        "available_capacity_kw": {"type": ["number", "null"]},
+        "source_document_ids": {"type": "array", "items": {"type": "string"}},
+        "abstained": {"type": "boolean"},
+        "abstain_reason": {"type": ["string", "null"]},
+        "corpus_snapshot_id": {"type": "string"},
+        "run_at": {"type": ["string", "null"], "format": "date-time"}
+      }
+    },
+
+    "SweepReport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["report_id", "generated_at", "runner", "summary", "methodology", "areas"],
+      "properties": {
+        "report_id": {"type": "string"},
+        "generated_at": {"type": "string", "format": "date-time"},
+        "runner": {"enum": ["nebius_serverless_job", "local_process"]},
+        "serverless_job_id": {"type": ["string", "null"]},
+        "summary": {"type": "object", "required": ["n_requested", "n_completed", "n_failed", "n_abstained"], "properties": {"n_requested": {"type": "integer"}, "n_completed": {"type": "integer", "description": "NEVER pad. Report completed and failed separately."}, "n_failed": {"type": "integer"}, "n_abstained": {"type": "integer"}, "by_feed_in_verdict": {"type": "object"}, "by_consumption_verdict": {"type": "object"}, "by_dso": {"type": "object"}, "direction_split_cases": {"type": "integer", "description": "Areas where feed-in and consumption verdicts differ — the empirical support for insight #1. This number is a headline."}}},
+        "methodology": {"type": "object", "required": ["area_selection", "corpus_snapshot_id", "exclusions", "known_biases"], "properties": {"area_selection": {"type": "string"}, "control_sample_fraction": {"type": "number"}, "corpus_snapshot_id": {"type": "string"}, "run_window": {"type": "string"}, "cache_policy": {"type": "string"}, "exclusions": {"type": "string"}, "known_biases": {"type": "string", "description": "Must state e.g. 'areas where the operator publishes no machine-readable register are abstentions, not negatives'"}}},
+        "cost": {"type": "object"},
+        "areas": {"type": "array", "items": {"$ref": "#/$defs/SweepArea"}}
+      }
+    },
+
+    "LedgerLine": {"$ref": "../../A-redflag-eu-product-safety/schemas/core-schemas.json#/$defs/LedgerLine"},
+    "Citation": {"$ref": "../../A-redflag-eu-product-safety/schemas/core-schemas.json#/$defs/Citation"}
+  },
+
+  "types": {
+    "ConnectionRequest": {"$ref": "#/$defs/ConnectionRequest"},
+    "LocationResolution": {"$ref": "#/$defs/LocationResolution"},
+    "SourceDocument": {"$ref": "#/$defs/SourceDocument"},
+    "RevisionEvent": {"$ref": "#/$defs/RevisionEvent"},
+    "PositionClaim": {"$ref": "#/$defs/PositionClaim"},
+    "Option": {"$ref": "#/$defs/Option"},
+    "LoadProfile": {"$ref": "#/$defs/LoadProfile"},
+    "PhoneScript": {"$ref": "#/$defs/PhoneScript"},
+    "DirectionResult": {"$ref": "#/$defs/DirectionResult"},
+    "Answer": {"$ref": "#/$defs/Answer"},
+    "SweepArea": {"$ref": "#/$defs/SweepArea"},
+    "SweepReport": {"$ref": "#/$defs/SweepReport"}
+  }
+}
