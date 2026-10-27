@@ -4,13 +4,14 @@
 UV ?= uv
 BACKEND := backend
 
-.PHONY: help sample check test lint format typecheck api ab clean require-uv
+.PHONY: help sample check test lint format typecheck api ab sweep clean require-uv
 
 help:
 	@echo "Available commands:"
 	@echo "  make sample    - Offline, no API key: gate + contracts + /v1/answer on SYNTHETIC fixtures"
 	@echo "  make check     - Lint, typecheck and run the full test suite (what CI runs)"
 	@echo "  make ab        - Gate ON vs OFF over the synthetic adversarial set -> runs/ab_experiment_results.json"
+	@echo "  make sweep     - 50-area sweep through the gated pipeline -> runs/sweep_summary.json (SYNTHETIC offline)"
 	@echo "  make test      - Run the full pytest suite"
 	@echo "  make lint      - ruff lint + format check"
 	@echo "  make format    - Apply ruff formatting and safe fixes"
@@ -46,6 +47,10 @@ api: require-uv
 # C-T23: gate_on vs gate_off over the SYNTHETIC adversarial set -> runs/ab_experiment_results.json (local arms)
 ab: require-uv
 	cd $(BACKEND) && $(UV) run python ../jobs/ab_branch_eval.py --check
+
+# C-T24: gated pipeline over 50 postcode areas -> runs/sweep_summary.json (fixture mode = SYNTHETIC, offline)
+sweep: require-uv
+	cd $(BACKEND) && $(UV) run python ../jobs/sweep_50_postcodes.py
 
 clean:
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +

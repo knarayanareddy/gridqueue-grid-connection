@@ -2,8 +2,8 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/gridqueue/schemas/core-schemas.json",
   "title": "GridQueue core contracts",
-  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation. v1.2.0: added QueryResponse (additive; the POST /v1/answer envelope) — see docs/DECISIONS.md. v1.3.0: added AbExperimentResult (additive; jobs/ab_branch_eval.py output, ticket C-T21-T23).",
-  "schema_version": "1.3.0",
+  "description": "FROZEN after ticket C-T09. SPEC.md §4 is the authoritative prose; data/source-register.v0.json holds the corpus contracts. This file is consumed by backend/tests/test_schemas.py (and, once written, backend/app/models.py). v1.1.0: null-proofed the conditional rules, added the partial-date pattern, inlined LedgerLine and Citation. v1.2.0: added QueryResponse (additive; the POST /v1/answer envelope) — see docs/DECISIONS.md. v1.3.0: added AbExperimentResult (additive; jobs/ab_branch_eval.py output, ticket C-T21-T23). v1.4.0: SweepArea/SweepReport extended additively for jobs/sweep_50_postcodes.py (per-direction detail in SweepDirection, area status, systematic_sample selection, mode/synthetic flags; ticket C-T24-PACKAGE).",
+  "schema_version": "1.4.0",
 
   "$defs": {
 
@@ -285,18 +285,50 @@
         "provincie": {"type": ["string", "null"]},
         "dso": {"type": "string"},
         "congestion_area_id": {"type": ["string", "null"]},
-        "selected_by": {"enum": ["registered_congestion", "control_sample", "manual"], "description": "METHODOLOGY LAW: a sweep containing only congested areas is cherry-picking. Include a control sample and label which is which."},
+        "selected_by": {"enum": ["registered_congestion", "control_sample", "manual", "systematic_sample"], "description": "METHODOLOGY LAW: a sweep containing only congested areas is cherry-picking. Include a control sample and label which is which. systematic_sample (v1.4.0): chosen by a fixed rule independent of congestion status, described in methodology.area_selection."},
         "feed_in_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
         "consumption_verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED", "NOT_RUN"]},
+        "indicative_date": {"type": ["string", "null"], "pattern": "^20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?(/20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?)?$", "description": "v1.4.0 producers: the earliest indicative date across directions; per-direction dates are in directions.*."},
+        "binding": {"enum": ["binding", "non_binding", "unknown", "not_applicable", null], "description": "Binding status of indicative_date."},
+        "available_capacity_kw": {"type": ["number", "null"], "description": "v1.4.0 producers leave this null; capacity has a direction, see directions.*.available_capacity_kw."},
+        "source_document_ids": {"type": "array", "items": {"type": "string"}},
+        "abstained": {"type": "boolean", "description": "v1.4.0 producers: true when BOTH directions abstained."},
+        "abstain_reason": {"type": ["string", "null"]},
+        "corpus_snapshot_id": {"type": "string"},
+        "run_at": {"type": ["string", "null"], "format": "date-time"},
+        "status": {"enum": ["completed", "failed"], "description": "v1.4.0. A failed area is reported, never dropped or padded."},
+        "error": {"type": ["string", "null"]},
+        "directions": {"type": ["object", "null"], "additionalProperties": false, "required": ["feed_in", "consumption"], "properties": {"feed_in": {"$ref": "#/$defs/SweepDirection"}, "consumption": {"$ref": "#/$defs/SweepDirection"}}}
+      },
+      "allOf": [
+        {"if": {"required": ["status"], "properties": {"status": {"const": "failed"}}}, "then": {"required": ["error"], "properties": {"error": {"type": "string", "minLength": 1}, "directions": {"type": "null"}}}},
+        {"if": {"required": ["status"], "properties": {"status": {"const": "completed"}}}, "then": {"required": ["directions"], "properties": {"directions": {"type": "object"}}}}
+      ]
+    },
+
+    "SweepDirection": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "v1.4.0. One direction of one sweep area, copied from the gated /v1/answer pipeline output. Every value here passed the deterministic gate.",
+      "required": ["verdict", "congestion_registered", "queue_status", "indicative_date", "binding", "available_capacity_kw", "non_firm_kw", "option_kinds", "source_document_ids", "abstained", "abstain_reason", "gate_checks_run"],
+      "properties": {
+        "verdict": {"enum": ["CAPACITY_AVAILABLE", "PARTIAL_CAPACITY", "NO_FIRM_CAPACITY", "NON_FIRM_ONLY", "WAITLIST_ONLY", "NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED"]},
+        "congestion_registered": {"type": ["boolean", "null"]},
+        "queue_status": {"type": ["string", "null"]},
         "indicative_date": {"type": ["string", "null"], "pattern": "^20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?(/20[0-9]{2}(-(Q[1-4]|H[12]|(0[1-9]|1[0-2])(-(0[1-9]|[12][0-9]|3[01]))?))?)?$"},
-        "binding": {"enum": ["binding", "non_binding", "unknown", "not_applicable", null]},
+        "binding": {"enum": ["binding", "non_binding", "unknown", "not_applicable"]},
         "available_capacity_kw": {"type": ["number", "null"]},
+        "non_firm_kw": {"type": ["number", "null"], "description": "kW the operator states for its non-firm connection route in this area (gate-verified), or null when not stated."},
+        "option_kinds": {"type": "array", "items": {"type": "string"}},
         "source_document_ids": {"type": "array", "items": {"type": "string"}},
         "abstained": {"type": "boolean"},
         "abstain_reason": {"type": ["string", "null"]},
-        "corpus_snapshot_id": {"type": "string"},
-        "run_at": {"type": ["string", "null"], "format": "date-time"}
-      }
+        "gate_checks_run": {"type": "integer", "minimum": 0}
+      },
+      "allOf": [
+        {"if": {"properties": {"indicative_date": {"type": "string"}}}, "then": {"properties": {"binding": {"enum": ["binding", "non_binding", "unknown"]}}}},
+        {"if": {"properties": {"verdict": {"enum": ["NO_OFFICIAL_POSITION_FOUND", "UNDETERMINED"]}}}, "then": {"properties": {"abstained": {"const": true}, "indicative_date": {"type": "null"}, "non_firm_kw": {"type": "null"}}}}
+      ]
     },
 
     "SweepReport": {
@@ -308,11 +340,18 @@
         "generated_at": {"type": "string", "format": "date-time"},
         "runner": {"enum": ["nebius_serverless_job", "local_process"]},
         "serverless_job_id": {"type": ["string", "null"]},
+        "mode": {"enum": ["fixture", "live"], "description": "v1.4.0. fixture = SYNTHETIC documents; live = Tavily + model."},
+        "synthetic": {"type": "boolean", "description": "v1.4.0. True when any input document is synthetic. A synthetic sweep says nothing about the Dutch grid."},
+        "request": {"type": "object", "description": "v1.4.0. The query sent for every area (power_kw, directions)."},
         "summary": {"type": "object", "required": ["n_requested", "n_completed", "n_failed", "n_abstained"], "properties": {"n_requested": {"type": "integer"}, "n_completed": {"type": "integer", "description": "NEVER pad. Report completed and failed separately."}, "n_failed": {"type": "integer"}, "n_abstained": {"type": "integer"}, "by_feed_in_verdict": {"type": "object"}, "by_consumption_verdict": {"type": "object"}, "by_dso": {"type": "object"}, "direction_split_cases": {"type": "integer", "description": "Areas where feed-in and consumption verdicts differ — the empirical support for insight #1. This number is a headline."}}},
         "methodology": {"type": "object", "required": ["area_selection", "corpus_snapshot_id", "exclusions", "known_biases"], "properties": {"area_selection": {"type": "string"}, "control_sample_fraction": {"type": "number"}, "corpus_snapshot_id": {"type": "string"}, "run_window": {"type": "string"}, "cache_policy": {"type": "string"}, "exclusions": {"type": "string"}, "known_biases": {"type": "string", "description": "Must state e.g. 'areas where the operator publishes no machine-readable register are abstentions, not negatives'"}}},
         "cost": {"type": "object"},
         "areas": {"type": "array", "items": {"$ref": "#/$defs/SweepArea"}}
-      }
+      },
+      "allOf": [
+        {"if": {"required": ["mode"], "properties": {"mode": {"const": "fixture"}}}, "then": {"required": ["synthetic"], "properties": {"synthetic": {"const": true}}}},
+        {"if": {"properties": {"runner": {"const": "nebius_serverless_job"}}}, "then": {"required": ["serverless_job_id"], "properties": {"serverless_job_id": {"type": "string", "minLength": 1}}}}
+      ]
     },
 
     "AbExperimentResult": {
@@ -504,6 +543,7 @@
     "Answer": {"$ref": "#/$defs/Answer"},
     "SweepArea": {"$ref": "#/$defs/SweepArea"},
     "SweepReport": {"$ref": "#/$defs/SweepReport"},
+    "SweepDirection": {"$ref": "#/$defs/SweepDirection"},
     "LedgerLine": {"$ref": "#/$defs/LedgerLine"},
     "Citation": {"$ref": "#/$defs/Citation"},
     "QueryResponse": {"$ref": "#/$defs/QueryResponse"},

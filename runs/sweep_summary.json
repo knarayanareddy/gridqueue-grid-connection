@@ -1,0 +1,2994 @@
+{
+  "report_id": "sweep-50-v1",
+  "generated_at": "2026-10-26T22:42:55Z",
+  "runner": "local_process",
+  "serverless_job_id": null,
+  "mode": "fixture",
+  "synthetic": true,
+  "request": {
+    "power_kw": 60.0,
+    "directions": [
+      "feed_in",
+      "consumption"
+    ],
+    "n_areas": 50
+  },
+  "summary": {
+    "n_requested": 50,
+    "n_completed": 50,
+    "n_failed": 0,
+    "n_abstained": 16,
+    "by_feed_in_verdict": {
+      "NO_OFFICIAL_POSITION_FOUND": 16,
+      "WAITLIST_ONLY": 34
+    },
+    "by_consumption_verdict": {
+      "CAPACITY_AVAILABLE": 17,
+      "NON_FIRM_ONLY": 17,
+      "NO_OFFICIAL_POSITION_FOUND": 16
+    },
+    "by_dso": {
+      "Enexis": {
+        "n_requested": 17,
+        "n_completed": 17,
+        "feed_in": {
+          "WAITLIST_ONLY": 17
+        },
+        "consumption": {
+          "CAPACITY_AVAILABLE": 17
+        }
+      },
+      "Liander": {
+        "n_requested": 17,
+        "n_completed": 17,
+        "feed_in": {
+          "WAITLIST_ONLY": 17
+        },
+        "consumption": {
+          "NON_FIRM_ONLY": 17
+        }
+      },
+      "Stedin": {
+        "n_requested": 16,
+        "n_completed": 16,
+        "feed_in": {
+          "NO_OFFICIAL_POSITION_FOUND": 16
+        },
+        "consumption": {
+          "NO_OFFICIAL_POSITION_FOUND": 16
+        }
+      }
+    },
+    "direction_split_cases": 34,
+    "no_firm_capacity": {
+      "feed_in": {
+        "n_no_firm_capacity": 34,
+        "n_closed": 0,
+        "n_with_official_position": 34,
+        "n_completed": 50,
+        "pct_of_areas_with_official_position": 100.0,
+        "pct_of_completed_areas": 68.0
+      },
+      "consumption": {
+        "n_no_firm_capacity": 17,
+        "n_closed": 0,
+        "n_with_official_position": 34,
+        "n_completed": 50,
+        "pct_of_areas_with_official_position": 50.0,
+        "pct_of_completed_areas": 34.0
+      }
+    },
+    "indicative_dates": {
+      "feed_in": {
+        "n_with_date": 17,
+        "n_congested_without_date": 17,
+        "distribution": {
+          "2028-Q3": 17
+        },
+        "binding": {
+          "non_binding": 17
+        },
+        "earliest": "2028-Q3",
+        "latest": "2028-Q3",
+        "median_quarter": "2028-Q3",
+        "mean_quarter": "2028-Q3"
+      },
+      "consumption": {
+        "n_with_date": 0,
+        "n_congested_without_date": 17,
+        "distribution": {},
+        "binding": {},
+        "earliest": null,
+        "latest": null,
+        "median_quarter": null,
+        "mean_quarter": null
+      }
+    },
+    "non_firm_capacity": {
+      "feed_in": {
+        "n_areas_with_non_firm_route": 17,
+        "n_with_stated_kw": 17,
+        "kw_min": 60,
+        "kw_median": 60,
+        "kw_max": 60,
+        "distribution": {
+          "60": 17
+        }
+      },
+      "consumption": {
+        "n_areas_with_non_firm_route": 0,
+        "n_with_stated_kw": 0,
+        "kw_min": null,
+        "kw_median": null,
+        "kw_max": null,
+        "distribution": {}
+      }
+    }
+  },
+  "methodology": {
+    "area_selection": "50 postcode4 areas, evenly spaced (endpoints included) within each postcode range the project maps today, split as evenly as possible: Enexis 5600–5658 (Eindhoven): 17; Liander 1000–1099 (Amsterdam): 17; Stedin 3000–3089 (Rotterdam): 16. The ranges come from ticket C-T14-T19 SPEC §1 and are UNVERIFIED against the operators' service-area publications (TODO_VERIFY(C-T04)). Selection uses no congestion data, so it is not cherry-picked towards congested areas, but it is not a list of commercial areas either (TODO_VERIFY(commercial-area-list)); some postcode4 values may not exist.",
+    "corpus_snapshot_id": "deab38d1b426efceacab84e659184b21a75e4272ffb69ae4673cdf258bc765af",
+    "run_window": "2026-10-26T22:42:55Z/2026-10-26T22:42:55Z",
+    "cache_policy": "None. Every area and direction runs S1–S5 in full. Caching S1–S3 by postcode4 + corpus snapshot (SPEC C-T24) is not implemented yet.",
+    "exclusions": "None. Failed areas are listed with status 'failed' and excluded from every aggregate; they are counted in n_failed, never padded.",
+    "known_biases": "Areas where no official position could be established are abstentions, not negatives: they are left out of the 'with official position' denominators and reported separately. This run used SYNTHETIC fixture documents (one Enexis, one Liander, none for Stedin), so every area of an operator gets the same answer and the aggregates only reflect how many areas fall in each operator's range. They say nothing about the Dutch grid.",
+    "mode": "fixture",
+    "synthetic": true,
+    "rate_limit": "min 0 s between area queries",
+    "definitions": {
+      "no_firm_capacity": "verdict WAITLIST_ONLY, NON_FIRM_ONLY or NO_FIRM_CAPACITY: the operator's published position is that a new request gets no firm capacity now. 'closed' = NO_FIRM_CAPACITY only.",
+      "indicative_dates": "Operator-published indicative dates (codeerprognoses) that passed the gate, with their binding status. mean_quarter = mean of the period start months, floored to a quarter; median_quarter uses the lower median. These are statistics of published estimates, not a forecast.",
+      "non_firm_kw": "kW the operator states for its non-firm connection route in that area, verified against the quote. Per-area figures; never summed (areas share grid assets).",
+      "direction_split_cases": "completed areas where both directions have an official position and the verdicts differ."
+    }
+  },
+  "cost": {
+    "total_usd": 0.0,
+    "tavily_calls": 0,
+    "model_calls": 0,
+    "wall_seconds": 0.072,
+    "note": "Fixture mode makes no external calls."
+  },
+  "areas": [
+    {
+      "postcode4": "5600",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5604",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5607",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5611",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5614",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5618",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5622",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5625",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5629",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5633",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5636",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5640",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5644",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5647",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5651",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5654",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "5658",
+      "gemeente": "Eindhoven",
+      "provincie": null,
+      "dso": "Enexis",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "CAPACITY_AVAILABLE",
+      "indicative_date": "2028-Q3",
+      "binding": "non_binding",
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_codeerprognose_403898ae3e"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "3126f099f514ecdad8233a5e5170192c50ce14ac616da20bfaf5912ad210352c",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": "2028-Q3",
+          "binding": "non_binding",
+          "available_capacity_kw": null,
+          "non_firm_kw": 60,
+          "option_kinds": [
+            "non_firm_connection",
+            "flex_transport_agreement",
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 8
+        },
+        "consumption": {
+          "verdict": "CAPACITY_AVAILABLE",
+          "congestion_registered": false,
+          "queue_status": "OPEN",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": 250,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [
+            "doc_dso_codeerprognose_403898ae3e"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 3
+        }
+      }
+    },
+    {
+      "postcode4": "1000",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1006",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1012",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1019",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1025",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1031",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1037",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1043",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1050",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1056",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1062",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1068",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1074",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1080",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1087",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1093",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "1099",
+      "gemeente": "Amsterdam",
+      "provincie": null,
+      "dso": "Liander",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "WAITLIST_ONLY",
+      "consumption_verdict": "NON_FIRM_ONLY",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [
+        "doc_dso_congestion_register_e505e366b1"
+      ],
+      "abstained": false,
+      "abstain_reason": null,
+      "corpus_snapshot_id": "f0643a07f8d20cf75f6b7a1f99ecfcb746669c0b862fb3642841cf21f76c5259",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "WAITLIST_ONLY",
+          "congestion_registered": true,
+          "queue_status": "WAITLIST",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 7
+        },
+        "consumption": {
+          "verdict": "NON_FIRM_ONLY",
+          "congestion_registered": true,
+          "queue_status": "CONDITIONAL",
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [
+            "congestion_management_participation"
+          ],
+          "source_document_ids": [
+            "doc_dso_congestion_register_e505e366b1"
+          ],
+          "abstained": false,
+          "abstain_reason": null,
+          "gate_checks_run": 2
+        }
+      }
+    },
+    {
+      "postcode4": "3000",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3006",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3012",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3018",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3024",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3030",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3036",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3042",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3047",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3053",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3059",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3065",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3071",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3077",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3083",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    },
+    {
+      "postcode4": "3089",
+      "gemeente": "Rotterdam",
+      "provincie": null,
+      "dso": "Stedin",
+      "congestion_area_id": null,
+      "selected_by": "systematic_sample",
+      "run_at": "2026-10-26T22:42:55Z",
+      "feed_in_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "consumption_verdict": "NO_OFFICIAL_POSITION_FOUND",
+      "indicative_date": null,
+      "binding": null,
+      "available_capacity_kw": null,
+      "source_document_ids": [],
+      "abstained": true,
+      "abstain_reason": "no_position_found",
+      "corpus_snapshot_id": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "status": "completed",
+      "error": null,
+      "directions": {
+        "feed_in": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        },
+        "consumption": {
+          "verdict": "NO_OFFICIAL_POSITION_FOUND",
+          "congestion_registered": null,
+          "queue_status": null,
+          "indicative_date": null,
+          "binding": "not_applicable",
+          "available_capacity_kw": null,
+          "non_firm_kw": null,
+          "option_kinds": [],
+          "source_document_ids": [],
+          "abstained": true,
+          "abstain_reason": "no_position_found",
+          "gate_checks_run": 0
+        }
+      }
+    }
+  ]
+}
