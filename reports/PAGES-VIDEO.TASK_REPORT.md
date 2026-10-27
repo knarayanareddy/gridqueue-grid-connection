@@ -132,7 +132,20 @@ Screenshots checked against `vite preview` of the Pages build: `?postcode=5612%2
 
 ## Pages status
 
-PAGES_STATUS_PLACEHOLDER
+- **Workflow:** `.github/workflows/deploy-pages.yml` was pushed in its own commit (`ci(pages): …`). The push
+  succeeded, so this token has the `workflow` scope. `docs/ci/deploy-pages.yml` is kept as the reference copy.
+- **Enabling Pages from here failed:**
+  ```
+  $ gh api -X POST repos/knarayanareddy/gridqueue-grid-connection/pages -f build_type=workflow
+  {"message":"Resource not accessible by integration", ... "status":"403"}
+  $ gh api repos/knarayanareddy/gridqueue-grid-connection/pages
+  {"message":"Not Found", ... "status":"404"}
+  ```
+- **Owner action, one time:** *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
+- **Then:** the site deploys on the first push to `main` after this branch is merged, or via *Actions → Deploy
+  GitHub Pages demo → Run workflow* on `main`.
+- **Not merged and not deployed:** agents do not merge without the user's request, so the URL is **not live
+  yet** (B4).
 
 ## TODO_VERIFY / open items
 

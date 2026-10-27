@@ -34,7 +34,7 @@ setup-node v7, configure-pages v6, upload-pages-artifact v5, deploy-pages v5).
 
 1. *Settings → Pages → Build and deployment → Source: GitHub Actions*; or
    `gh api -X POST repos/knarayanareddy/gridqueue-grid-connection/pages -f build_type=workflow`.
-2. If it is not already there, copy `docs/ci/deploy-pages.yml` to `.github/workflows/deploy-pages.yml` (same
+2. The workflow is already in `.github/workflows/deploy-pages.yml`; if it is ever missing, copy `docs/ci/deploy-pages.yml` to `.github/workflows/deploy-pages.yml` (same
    `workflow` scope caveat as above) and push to `main`.
 
 Check locally first: `make build-pages && make pages-preview` serves the same build on port 4173.
