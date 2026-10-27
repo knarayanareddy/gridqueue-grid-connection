@@ -1,0 +1,20 @@
+{
+  "name": "gridqueue-demo-video",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Records docs/media/gridqueue-demo.{mp4,webm} from the static Pages build, following video/script.md",
+  "type": "module",
+  "engines": {
+    "node": ">=22.6"
+  },
+  "scripts": {
+    "record": "node --experimental-strip-types record-demo.ts"
+  },
+  "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "1.1.0",
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/plus-jakarta-sans": "5.3.0",
+    "playwright-core": "1.64.1"
+  }
+}

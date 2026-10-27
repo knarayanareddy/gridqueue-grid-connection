@@ -739,3 +739,109 @@ blockquote.route {
 .reach--no {
   color: var(--color-text-secondary);
 }
+
+/* ------------------------------------------------------------------ static Pages demo */
+
+.shell--embed {
+  padding-top: 20px;
+}
+
+.query[hidden] {
+  display: none;
+}
+
+.banner--static {
+  align-items: flex-start;
+  border-color: var(--color-grid-blue);
+  background: color-mix(in srgb, var(--color-grid-blue) 10%, transparent);
+}
+
+.banner--static a {
+  word-break: normal;
+}
+
+.error svg,
+.banner--static svg {
+  flex: none;
+  margin-top: 3px;
+}
+
+.field small {
+  margin-top: 2px;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.picker.is-highlighted {
+  border-color: var(--color-congested);
+}
+
+.picker__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.picker__title .muted {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.picker__dso {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.picker__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.pc-chip:hover {
+  border-color: var(--color-text-secondary);
+}
+
+.pc-chip.is-active {
+  border-color: var(--color-grid-blue);
+  background: color-mix(in srgb, var(--color-grid-blue) 20%, var(--color-bg-secondary));
+}
+
+.pc-chip__tag {
+  padding: 0 5px;
+  border-radius: 4px;
+  border: 1px dashed var(--color-text-secondary);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 11px;
+}
+
+.picker__foot {
+  margin: 0;
+}

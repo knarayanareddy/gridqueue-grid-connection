@@ -1,0 +1,53 @@
+# Deploys the static GridQueue demo (make build-pages -> frontend/dist/) to GitHub Pages on every push to main.
+# Canonical copy: .github/workflows/deploy-pages.yml. This mirror exists because the agent token cannot always push
+# workflow files — see docs/ci/README.md. Action versions checked against each action's latest release on 2026-10-27.
+name: Deploy GitHub Pages demo
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; never cancel one that is already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.2 # setup-uv publishes no floating major tag
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install UI dependencies
+        run: cd frontend && npm ci --no-audit --no-fund
+      - name: Precompute the SYNTHETIC snapshot and build the static site
+        run: make build-pages
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
