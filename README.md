@@ -17,6 +17,8 @@ retrieval time. It does not predict capacity and is not affiliated with any grid
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 · [Limitations](LIMITATIONS.md) · [Architecture](ARCHITECTURE.md) · [Spec](SPEC.md)
+· [Static demo](https://knarayanareddy.github.io/gridqueue-grid-connection/) (precomputed, SYNTHETIC; live once
+the Pages workflow has deployed) · [Demo video](docs/media/gridqueue-demo.mp4) (2:50; [captions](docs/media/gridqueue-demo.vtt))
 
 **Target:** Nebius × NVIDIA Global AI Hackathon, Best Apps and Agents track (also eligible for Best Use of Tavily).
 
@@ -45,6 +47,8 @@ Factory Sandbox or as a Serverless Job, and the corpus of official documents doe
 | Gate-on vs gate-off A/B over a SYNTHETIC adversarial set | 🟡 measured as **local** arms from one snapshot; not yet Sandbox branches | `jobs/ab_branch_eval.py`, `runs/ab_experiment_results.json` |
 | 50-area postcode sweep through the gated pipeline | 🟡 job + image written; **run offline on SYNTHETIC fixtures only**; not yet submitted as a Nebius Serverless Job | `jobs/sweep_50_postcodes.py`, `runs/sweep_summary.json`, `jobs/Dockerfile` |
 | Frontend UI (Direction Card, ranked options, quote pill, gate report; A/B Gate Evidence tab) | ✅ builds; one direction per query | `frontend/src/App.tsx` |
+| Static demo site (GitHub Pages): the same UI over a precomputed fixture-mode snapshot of 52 areas, both directions; no backend, no API calls | 🟡 builds (`make build-pages`); deploy workflow written, live only after it runs on `main` | `scripts/build_static_demo.py`, `frontend/src/data.ts`, [`docs/ci/README.md`](docs/ci/README.md) |
+| Demo video, recorded by a script from the static demo; synthetic TTS voice-over | ✅ `docs/media/gridqueue-demo.mp4` / `.webm`, 170 s | `scripts/record-demo.ts`, [`scripts/README.md`](scripts/README.md) |
 | CI | ⏳ workflow written, not yet enabled | [`docs/ci/README.md`](docs/ci/README.md) |
 
 ---

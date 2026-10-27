@@ -28,6 +28,18 @@ import type {
   SourceDocument,
   Verdict,
 } from "./types";
+import {
+  NotInSnapshotError,
+  STATIC_DEMO,
+  fetchAbResults,
+  fetchAnswer,
+  fetchSnapshotIndex,
+  postcode4Of,
+  readDeepLink,
+  type DeepLink,
+  type SnapshotArea,
+  type SnapshotIndex,
+} from "./data";
 
 // ---------------------------------------------------------------------------------------------- formatting
 
@@ -300,40 +312,108 @@ function GateReport({ data }: { data: QueryResponse }) {
 
 // ---------------------------------------------------------------------------------------------- app
 
-function QueryView() {
-  const [postcode, setPostcode] = useState("5612 AB");
+const VERDICT_SHORT: Record<Verdict, string> = {
+  CAPACITY_AVAILABLE: "capacity",
+  PARTIAL_CAPACITY: "partial",
+  NO_FIRM_CAPACITY: "no firm capacity",
+  WAITLIST_ONLY: "waitlist",
+  NON_FIRM_ONLY: "non-firm only",
+  NO_OFFICIAL_POSITION_FOUND: "no official position",
+  UNDETERMINED: "undetermined",
+};
+
+/** Static demo only: every precomputed postcode area, grouped by grid operator, one click to load. */
+function SnapshotPicker({
+  areas,
+  current,
+  onPick,
+  highlight,
+}: {
+  areas: SnapshotArea[];
+  current: string | null;
+  onPick: (pc4: string) => void;
+  highlight: boolean;
+}) {
+  const byDso = new Map<string, SnapshotArea[]>();
+  for (const a of areas) byDso.set(a.dso, [...(byDso.get(a.dso) ?? []), a]);
+  return (
+    <section className={highlight ? "card picker is-highlighted" : "card picker"} aria-labelledby="picker-heading">
+      <h2 id="picker-heading" className="picker__title">
+        Precomputed postcode areas <span className="muted">· {areas.length} in this snapshot, click one to load it</span>
+      </h2>
+      {[...byDso.entries()].map(([dso, list]) => (
+        <div key={dso} className="picker__group">
+          <h3 className="picker__dso">
+            {dso} <span className="muted">· {list.length}</span>
+          </h3>
+          <ul className="picker__chips">
+            {list.map((a) => {
+              const title = `${a.postcode4} ${a.gemeente ?? ""} — feed-in: ${VERDICT_SHORT[a.verdicts.feed_in]}, consumption: ${
+                VERDICT_SHORT[a.verdicts.consumption]
+              }${a.note ? ` (${a.note})` : ""}`;
+              return (
+                <li key={a.postcode4}>
+                  <button
+                    type="button"
+                    className={current === a.postcode4 ? "pc-chip is-active" : "pc-chip"}
+                    aria-pressed={current === a.postcode4}
+                    aria-label={title}
+                    title={title}
+                    onClick={() => onPick(a.postcode4)}
+                  >
+                    {a.postcode4}
+                    {a.source === "video_demo" && <span className="pc-chip__tag">video</span>}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+      <p className="muted small picker__foot">
+        50 areas are the sweep&apos;s systematic sample; the two tagged <em>video</em> are the areas the demo video uses.
+        Stedin areas abstain on purpose: the fixtures hold no Stedin position, so the answer is a refusal, not a guess.
+      </p>
+    </section>
+  );
+}
+
+function QueryView({ link, snapshot }: { link: DeepLink; snapshot: SnapshotIndex | null }) {
+  const [postcode, setPostcode] = useState(link.postcode ?? "5612 AB");
   const [kw, setKw] = useState("60");
-  const [direction, setDirection] = useState<Direction>("feed_in");
+  const [direction, setDirection] = useState<Direction>(link.direction ?? "feed_in");
   const [data, setData] = useState<QueryResponse | null>(null);
   const [requestedKw, setRequestedKw] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [missing, setMissing] = useState(false);
   const [loading, setLoading] = useState(false);
   const controller = useRef<AbortController | null>(null);
+  // The static snapshot was computed at one power; the field shows it and cannot be changed.
+  const power = STATIC_DEMO ? String(snapshot?.power_kw ?? 60) : kw;
 
-  async function submit(e: FormEvent) {
-    e.preventDefault();
+  async function run(pc: string, dir: Direction) {
     controller.current?.abort();
     const ac = new AbortController();
     controller.current = ac;
     setLoading(true);
     setError(null);
-    const power = Number(kw);
+    setMissing(false);
+    const powerKw = Number(power);
     try {
-      const res = await fetch("/v1/answer", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ postcode, power_kw: power, direction }),
-        signal: ac.signal,
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => null);
-        const detail = Array.isArray(body?.detail) ? body.detail.map((d: { msg: string }) => d.msg).join("; ") : null;
-        throw new Error(detail ? `Check your input: ${detail}` : `The server returned ${res.status}.`);
+      const answer = await fetchAnswer({ postcode: pc, power_kw: powerKw, direction: dir }, ac.signal);
+      setData(answer);
+      setRequestedKw(powerKw);
+      if (STATIC_DEMO && !link.embed) {
+        // Keep the address bar shareable: the current view is a deep link.
+        const url = new URL(window.location.href);
+        url.searchParams.set("postcode", pc.trim());
+        url.searchParams.set("direction", dir);
+        window.history.replaceState(null, "", url);
       }
-      setData((await res.json()) as QueryResponse);
-      setRequestedKw(power);
     } catch (err) {
       if ((err as Error).name !== "AbortError") {
+        setData(null);
+        setMissing(err instanceof NotInSnapshotError);
         setError((err as Error).message || "Request failed.");
       }
     } finally {
@@ -343,6 +423,32 @@ function QueryView() {
       }
     }
   }
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    void run(postcode, direction);
+  }
+
+  function pick(pc4: string) {
+    setPostcode(pc4);
+    void run(pc4, direction);
+  }
+
+  function changeDirection(d: Direction) {
+    setDirection(d);
+    // Static answers are instant, so the toggle re-asks straight away once there is a result on screen.
+    if (STATIC_DEMO && data) void run(postcode, d);
+  }
+
+  // A deep link (?postcode=…) asks immediately, once.
+  const askedFromLink = useRef(false);
+  useEffect(() => {
+    if (link.postcode && !askedFromLink.current) {
+      askedFromLink.current = true;
+      void run(link.postcode, link.direction ?? "feed_in");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function cancel() {
     controller.current?.abort();
@@ -354,7 +460,8 @@ function QueryView() {
 
   return (
     <>
-      <form className="card query" onSubmit={submit} aria-label="Grid position query">
+      {/* Embedded (?embed=1, e.g. the video's split screen): the answer only — its eyebrow names direction and place. */}
+      <form className="card query" onSubmit={submit} aria-label="Grid position query" hidden={link.embed}>
         <label className="field">
           <span>Postcode</span>
           <input
@@ -374,16 +481,23 @@ function QueryView() {
             inputMode="decimal"
             min={0.1}
             step="any"
-            value={kw}
+            value={power}
             onChange={(e) => setKw(e.target.value)}
+            readOnly={STATIC_DEMO}
+            aria-describedby={STATIC_DEMO ? "kw-fixed" : undefined}
             required
           />
+          {STATIC_DEMO && (
+            <small id="kw-fixed" className="muted small">
+              Fixed in the static demo
+            </small>
+          )}
         </label>
         <fieldset className="field segmented">
           <legend>Direction</legend>
           {(["feed_in", "consumption"] as const).map((d) => (
             <label key={d} className={direction === d ? "is-active" : ""}>
-              <input type="radio" name="direction" value={d} checked={direction === d} onChange={() => setDirection(d)} />
+              <input type="radio" name="direction" value={d} checked={direction === d} onChange={() => changeDirection(d)} />
               {d === "feed_in" ? <Sun size={14} aria-hidden="true" /> : <PlugZap size={14} aria-hidden="true" />}
               {d === "feed_in" ? "Feed-in" : "Consumption"}
             </label>
@@ -450,6 +564,10 @@ function QueryView() {
           </>
         )}
       </div>
+
+      {STATIC_DEMO && snapshot && !link.embed && (
+        <SnapshotPicker areas={snapshot.areas} current={postcode4Of(postcode)} onPick={pick} highlight={missing} />
+      )}
     </>
   );
 }
@@ -501,14 +619,8 @@ function AbEvidence() {
 
   useEffect(() => {
     const ac = new AbortController();
-    fetch("/v1/ab-results", { signal: ac.signal })
-      .then(async (res) => {
-        if (!res.ok) {
-          const body = await res.json().catch(() => null);
-          throw new Error(typeof body?.detail === "string" ? body.detail : `The server returned ${res.status}.`);
-        }
-        setResult((await res.json()) as AbExperimentResult);
-      })
+    fetchAbResults(ac.signal)
+      .then(setResult)
       .catch((err: Error) => {
         if (err.name !== "AbortError") setError(err.message || "Could not load the A/B results.");
       });
@@ -680,9 +792,19 @@ const TABS = [
 type TabId = (typeof TABS)[number]["id"];
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>("direction");
-  const [abOpened, setAbOpened] = useState(false);
+  const [link] = useState<DeepLink>(() => readDeepLink());
+  const [tab, setTab] = useState<TabId>(link.tab ?? "direction");
+  const [abOpened, setAbOpened] = useState(link.tab === "ab");
+  const [snapshot, setSnapshot] = useState<SnapshotIndex | null>(null);
+  const [snapshotError, setSnapshotError] = useState<string | null>(null);
   const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  useEffect(() => {
+    if (!STATIC_DEMO) return;
+    fetchSnapshotIndex()
+      .then(setSnapshot)
+      .catch((err: Error) => setSnapshotError(err.message || "Could not load the demo snapshot."));
+  }, []);
 
   function select(id: TabId) {
     setTab(id);
@@ -698,38 +820,60 @@ export default function App() {
   }
 
   return (
-    <div className="shell">
-      <header className="masthead">
-        <div className="brand">
-          <span className="brand__mark" aria-hidden="true" />
-          GridQueue
-        </div>
-        <p className="muted">Grid-connection answers in the operator's own words — or an honest “we don't know”.</p>
-      </header>
+    <div className={link.embed ? "shell shell--embed" : "shell"}>
+      {!link.embed && (
+        <header className="masthead">
+          <div className="brand">
+            <span className="brand__mark" aria-hidden="true" />
+            GridQueue
+          </div>
+          <p className="muted">Grid-connection answers in the operator's own words — or an honest “we don't know”.</p>
+        </header>
+      )}
 
-      <div className="tabs" role="tablist" aria-label="Views" onKeyDown={onKey}>
-        {TABS.map((t) => (
-          <button
-            key={t.id}
-            ref={(el) => (tabRefs.current[t.id] = el)}
-            type="button"
-            role="tab"
-            id={`tab-${t.id}`}
-            aria-selected={tab === t.id}
-            aria-controls={`panel-${t.id}`}
-            tabIndex={tab === t.id ? 0 : -1}
-            className={tab === t.id ? "tab is-active" : "tab"}
-            onClick={() => select(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      {STATIC_DEMO && !link.embed && (
+        <p className="banner banner--static" role="note">
+          <FlaskConical size={16} aria-hidden="true" />
+          <span>
+            <strong>Static demo.</strong> Every answer here was precomputed by the GridQueue pipeline in fixture mode
+            from SYNTHETIC documents — not official publications, no live Tavily or model calls, power fixed at{" "}
+            {snapshot?.power_kw ?? 60} kW.{" "}
+            <a href="https://github.com/knarayanareddy/gridqueue-grid-connection">Run it locally</a> (README, “Try
+            it”) for any postcode and live retrieval.
+          </span>
+        </p>
+      )}
+      {snapshotError && (
+        <p className="card error" role="alert">
+          <AlertTriangle size={16} aria-hidden="true" /> {snapshotError}
+        </p>
+      )}
+
+      {!link.embed && (
+        <div className="tabs" role="tablist" aria-label="Views" onKeyDown={onKey}>
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              ref={(el) => (tabRefs.current[t.id] = el)}
+              type="button"
+              role="tab"
+              id={`tab-${t.id}`}
+              aria-selected={tab === t.id}
+              aria-controls={`panel-${t.id}`}
+              tabIndex={tab === t.id ? 0 : -1}
+              className={tab === t.id ? "tab is-active" : "tab"}
+              onClick={() => select(t.id)}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Both panels stay mounted so a query survives switching tabs. */}
       <div role="tabpanel" id="panel-direction" aria-labelledby="tab-direction" hidden={tab !== "direction"}>
         <div className="results">
-          <QueryView />
+          <QueryView link={link} snapshot={snapshot} />
         </div>
       </div>
       <div role="tabpanel" id="panel-ab" aria-labelledby="tab-ab" hidden={tab !== "ab"}>

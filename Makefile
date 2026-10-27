@@ -4,7 +4,7 @@
 UV ?= uv
 BACKEND := backend
 
-.PHONY: help sample check test lint format typecheck api ab sweep clean require-uv
+.PHONY: build-pages pages-preview demo-video help sample check test lint format typecheck api ab sweep clean require-uv
 
 help:
 	@echo "Available commands:"
@@ -17,6 +17,9 @@ help:
 	@echo "  make format    - Apply ruff formatting and safe fixes"
 	@echo "  make typecheck - mypy over backend/app"
 	@echo "  make api       - Start the FastAPI server on 0.0.0.0:8000"
+	@echo "  make build-pages - Static GitHub Pages demo (precomputed SYNTHETIC answers) -> frontend/dist/"
+	@echo "  make pages-preview - Serve frontend/dist/ at http://localhost:4173/gridqueue-grid-connection/"
+	@echo "  make demo-video - Record docs/media/gridqueue-demo.{mp4,webm} from the Pages build (needs scripts/ deps)"
 	@echo "  make clean     - Remove virtualenvs, caches and build artifacts"
 
 require-uv:
@@ -51,6 +54,18 @@ ab: require-uv
 # C-T24: gated pipeline over 50 postcode areas -> runs/sweep_summary.json (fixture mode = SYNTHETIC, offline)
 sweep: require-uv
 	cd $(BACKEND) && $(UV) run python ../jobs/sweep_50_postcodes.py
+
+# Static GitHub Pages demo: answers precomputed by the pipeline in fixture mode (SYNTHETIC), then the Pages build.
+build-pages: require-uv
+	cd $(BACKEND) && $(UV) run python ../scripts/build_static_demo.py
+	cd frontend && (test -d node_modules || npm ci --no-audit --no-fund) && npm run build -- --mode pages
+
+pages-preview:
+	cd frontend && npx vite preview --mode pages --port 4173 --strictPort
+
+# Demo video (video/script.md, 12 shots, 170 s) recorded with Playwright from the Pages build. See scripts/README.md.
+demo-video: build-pages
+	cd scripts && (test -d node_modules || npm ci --no-audit --no-fund) && node --experimental-strip-types record-demo.ts
 
 clean:
 	find . -type d -name "__pycache__" -prune -exec rm -rf {} +

@@ -158,3 +158,22 @@ until the docs are updated.
 **D-024 · The video script is locked to what exists.**
 12 shots, exactly 170 s, ≤ 2.7 spoken words/s. The test fails if a numeral in the narration is not in the README
 or LIMITATIONS. Features that are not built are not shown; swaps need published evidence first.
+
+**D-025 · The static demo is a precomputed snapshot, not a browser port of the pipeline.**
+`scripts/build_static_demo.py` runs the real `answer_query` in fixture mode and writes one `QueryResponse` JSON per
+area × direction, plus the run files the A/B tab already reads. The frontend switches on `VITE_STATIC_DEMO` and
+fetches those files instead of `/v1/answer`. There is one rendering path for both modes and no second
+implementation of the gate in TypeScript. Tests (`test_static_demo.py`) check the snapshot against the pipeline,
+including the 3011 refusal and the A/B figures.
+
+**D-026 · Video tooling lives in `scripts/package.json`, outside the frontend.**
+The user named Playwright for this mission. `playwright-core` (no browser download), `@ffmpeg-installer/ffmpeg` and
+the three `@fontsource-variable` font packages are recording-only dependencies, pinned exactly. The fonts are the
+families `tokens.css` already names, installed from npm because the font CDNs are unreachable from the recording
+sandbox. The frontend's dependencies are unchanged.
+
+**D-027 · The video is timed by a scheduler and checked.**
+Shots start on the script's timecodes. A start more than 0.25 s late fails the run; actual starts are written to
+`docs/media/gridqueue-demo.timeline.json` and checked by a test. Encoding resamples to 25 fps and trims at a white
+sync frame, because `recordVideo` output has a variable frame rate. S09 runs the real withholding tests on camera,
+not a replay.
