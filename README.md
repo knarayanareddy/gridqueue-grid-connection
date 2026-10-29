@@ -208,8 +208,8 @@ are counted, never padded.
 - **Known gap, measured:** the prior is only as strong as the marker list. A "binding" claim backed by a
   sentence that says *indicatieve* still passes (A/B case M04; see [LIMITATIONS](LIMITATIONS.md)).
 
-**Models (planned, verify against the authenticated catalog, ticket C-T02):** `nvidia/Nemotron-3-Ultra-550b-a55b`
-(position extraction), `nvidia/nemotron-3-super-120b-a12b` (options), `nvidia/nemotron-3-nano`
+**Models (verified against authenticated Token Factory catalog & live-executed):** `nvidia/Nemotron-3-Ultra-550b-a55b`
+(live extraction verified & ledgered), `nvidia/nemotron-3-super-120b-a12b` (options), `nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`
 (pre-summarisation).
 
 ---
