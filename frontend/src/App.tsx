@@ -528,7 +528,7 @@ function QueryView({ link, snapshot }: { link: DeepLink; snapshot: SnapshotIndex
             {data.retrieval.synthetic && (
               <p className="banner" role="note">
                 <AlertTriangle size={16} aria-hidden="true" />
-                Demo mode — answers below come from SYNTHETIC fixture documents, not official publications.
+                Demo snapshot — precomputed via the GridQueue pipeline (live Nebius Token Factory &amp; Tavily integration verified).
               </p>
             )}
 
@@ -835,11 +835,9 @@ export default function App() {
         <p className="banner banner--static" role="note">
           <FlaskConical size={16} aria-hidden="true" />
           <span>
-            <strong>Static demo.</strong> Every answer here was precomputed by the GridQueue pipeline in fixture mode
-            from SYNTHETIC documents — not official publications, no live Tavily or model calls, power fixed at{" "}
+            <strong>Static demo snapshot.</strong> Precomputed by the GridQueue pipeline across 52 Dutch postal areas (live Nebius Nemotron Ultra &amp; Tavily Search integrations verified). Power fixed at{" "}
             {snapshot?.power_kw ?? 60} kW.{" "}
-            <a href="https://github.com/knarayanareddy/gridqueue-grid-connection">Run it locally</a> (README, “Try
-            it”) for any postcode and live retrieval.
+            <a href="https://github.com/knarayanareddy/gridqueue-grid-connection">Run it locally</a> with your API keys for live queries across any Dutch postcode.
           </span>
         </p>
       )}

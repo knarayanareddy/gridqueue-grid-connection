@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-27T09:55:59.824Z",
+ "generated_at": "2026-10-29T17:21:25.613Z",
  "script": "video/script.md",
  "runtime_s": 170,
  "frame": {
@@ -12,79 +12,79 @@
  },
  "zoom": 1.25,
  "fps": 25,
- "sync_offset_s": 1.36,
+ "sync_offset_s": 0.04,
  "shots": [
   {
    "id": "S01",
    "planned": 0,
-   "started": 0.005,
-   "late": 0.005
+   "started": 0.004,
+   "late": 0.004
   },
   {
    "id": "S02",
    "planned": 14,
-   "started": 14.004,
-   "late": 0.004
+   "started": 14.001,
+   "late": 0.001
   },
   {
    "id": "S03",
    "planned": 18,
-   "started": 18.001,
-   "late": 0.001
+   "started": 18,
+   "late": 0
   },
   {
    "id": "S04",
    "planned": 40,
-   "started": 40.001,
-   "late": 0.001
+   "started": 40.002,
+   "late": 0.002
   },
   {
    "id": "S05",
    "planned": 59,
-   "started": 59,
-   "late": 0
+   "started": 59.001,
+   "late": 0.001
   },
   {
    "id": "S06",
    "planned": 76,
-   "started": 76.003,
-   "late": 0.003
+   "started": 76,
+   "late": 0
   },
   {
    "id": "S07",
    "planned": 96,
-   "started": 96.002,
-   "late": 0.002
+   "started": 96.001,
+   "late": 0.001
   },
   {
    "id": "S08",
    "planned": 116,
-   "started": 115.999,
-   "late": -0.001
+   "started": 116.001,
+   "late": 0.001
   },
   {
    "id": "S09",
    "planned": 126,
-   "started": 126.006,
-   "late": 0.006
+   "started": 126,
+   "late": 0
   },
   {
    "id": "S10",
    "planned": 134,
-   "started": 134.001,
-   "late": 0.001
+   "started": 134,
+   "late": 0
   },
   {
    "id": "S11",
    "planned": 156,
-   "started": 156.001,
-   "late": 0.001
+   "started": 156,
+   "late": 0
   },
   {
    "id": "S12",
    "planned": 166,
-   "started": 166.003,
-   "late": 0.003
+   "started": 166,
+   "late": 0
   }
  ],
  "voiceover": [
@@ -109,7 +109,7 @@
   {
    "file": "S03.mp3",
    "clip_from": 0,
-   "clip_to": 18.65,
+   "clip_to": 18.91,
    "at": 18.6,
    "shots": [
     "S03"
@@ -154,7 +154,7 @@
   {
    "file": "S08-S09.mp3",
    "clip_from": 0,
-   "clip_to": 17.48,
+   "clip_to": 15.94,
    "at": 116.2,
    "shots": [
     "S08",
@@ -173,7 +173,7 @@
   {
    "file": "S11.mp3",
    "clip_from": 0,
-   "clip_to": 9.12,
+   "clip_to": 9.6,
    "at": 156.4,
    "shots": [
     "S11"
@@ -191,21 +191,21 @@
  ],
  "voice": "synthetic text-to-speech, disclosed on the end card",
  "captions": "burned in + gridqueue-demo.vtt",
- "s09_pytest_summary": "8 passed, 11 deselected in 0.17s",
+ "s09_pytest_summary": "8 passed, 11 deselected in 0.32s",
  "outputs": {
   "mp4": {
-   "duration": 170.02,
+   "duration": 170,
    "width": 1920,
    "height": 1080,
    "audio": true,
-   "bytes": 17866908
+   "bytes": 19283593
   },
   "webm": {
    "duration": 170.01,
    "width": 1920,
    "height": 1080,
    "audio": true,
-   "bytes": 15171968
+   "bytes": 15812138
   }
  }
 }

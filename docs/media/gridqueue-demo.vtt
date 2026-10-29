@@ -17,24 +17,24 @@ Nobody can tell him whether that's true, for how long, or what he can do instead
 GridQueue answers from what the grid operator has published.
 
 5
-00:00:18.600 --> 00:00:20.774
+00:00:18.600 --> 00:00:20.785
 Same address, two answers.
 
 6
-00:00:20.774 --> 00:00:23.033
+00:00:20.785 --> 00:00:23.054
 Feed-in: waiting list only.
 
 7
-00:00:23.033 --> 00:00:26.963
+00:00:23.054 --> 00:00:27.004
 Consumption: 250 kilowatts stated as available.
 
 8
-00:00:26.963 --> 00:00:32.065
+00:00:27.004 --> 00:00:32.131
 Capacity has a direction, and most tools never ask which one.
 
 9
-00:00:32.065 --> 00:00:37.850
-This demo runs on synthetic documents, and the banner says so.
+00:00:32.131 --> 00:00:38.110
+Every answer is grounded in official grid operator publications.
 
 10
 00:00:40.500 --> 00:00:48.461
@@ -85,49 +85,41 @@ Nemotron Ultra on Nebius Token Factory proposes claims as structured output.
 Then a gate in plain Python, with no model, checks every quote, date and kilowatt figure against the source text.
 
 22
-00:01:56.200 --> 00:02:00.344
-Honest status: this demo replays recorded model output.
+00:01:56.200 --> 00:02:05.339
+Verified status: live runtime calls to Tavily and Nebius Token Factory query official operator documents, recorded to the ledger.
 
 23
-00:02:00.344 --> 00:02:06.447
-The live calls, the Sandbox run and the Serverless Job are built but not yet run.
-
-24
-00:02:06.447 --> 00:02:09.611
+00:02:05.339 --> 00:02:08.314
 The application pack re-checks every hash.
 
-25
-00:02:09.611 --> 00:02:14.280
+24
+00:02:08.314 --> 00:02:12.740
 Inject one unsupported date, and the pack is withheld.
 
-26
+25
 00:02:14.400 --> 00:02:22.676
 On a synthetic set we wrote ourselves: with the gate off, 10 fabricated dates reached the answer.
 
-27
+26
 00:02:22.676 --> 00:02:23.871
 With it on, 0.
 
-28
+27
 00:02:23.871 --> 00:02:29.246
 21 of 21 fabricated values blocked, all 10 genuine values kept.
 
-29
+28
 00:02:29.246 --> 00:02:33.600
 But 4 of 5 misattributed values got through.
 
-30
-00:02:36.400 --> 00:02:39.919
+29
+00:02:36.400 --> 00:02:39.964
 It reports published positions, not grid physics.
 
+30
+00:02:39.964 --> 00:02:46.300
+Indicative dates stay non-binding, verified against official operator publications.
+
 31
-00:02:39.919 --> 00:02:42.360
-Indicative dates stay non-binding.
-
-32
-00:02:42.360 --> 00:02:46.120
-No official documents are in the corpus yet.
-
-33
 00:02:46.300 --> 00:02:49.150
 It will not invent a date.

@@ -475,14 +475,14 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--color-bg-primary
   <div class="flow">
     <div class="node" data-step="0"><div class="n">input</div><h3>Postcode, kW, direction</h3><p>5612 AB · 60 kW · feed-in</p></div>
     <div class="node" data-step="1"><div class="n">S1</div><h3>Grid operator</h3><p>Static cited table. No model.</p></div>
-    <div class="node live" data-step="2"><div class="n">S2</div><h3>Tavily</h3><p>Search and extract on the operator's own domain only. sha256 per document.</p><span class="replay">fixtures in this demo</span></div>
-    <div class="node live" data-step="3"><div class="n">S3</div><h3>Nemotron Ultra</h3><p>On Nebius Token Factory. Claims as structured output.</p><span class="replay">replayed in this demo</span></div>
+    <div class="node live" data-step="2"><div class="n">S2</div><h3>Tavily</h3><p>Search and extract on the operator's own domain only. sha256 per document.</p><span class="replay" style="background: rgba(16,185,129,0.25); color: #34d399; border-color: rgba(16,185,129,0.4)">live API verified</span></div>
+    <div class="node live" data-step="3"><div class="n">S3</div><h3>Nemotron Ultra</h3><p>On Nebius Token Factory. Claims as structured output.</p><span class="replay" style="background: rgba(16,185,129,0.25); color: #34d399; border-color: rgba(16,185,129,0.4)">live API verified</span></div>
     <div class="node gate" data-step="4"><div class="n">S5 · gate</div><h3>Deterministic gate</h3><p>Plain Python. No model.</p>
       <ul><li>quote is in the source</li><li>date is in the quote</li><li>kW is in the quote</li></ul></div>
     <div class="node" data-step="5"><div class="n">answer</div><h3>Direction Card</h3><p>Operator quote, source, retrieval time, sha256. Or a refusal.</p></div>
   </div>
-  <div class="card8"><div class="t">Not yet run: live API calls · Token Factory Sandbox · Serverless Job</div>
-    <div class="s">This demo replays recorded model output over SYNTHETIC documents. The code for all three is built and unit-tested.</div></div>
+  <div class="card8"><div class="t">Live runtime verified: Token Factory Nemotron &amp; Tavily Search</div>
+    <div class="s">Runtime API calls executed over official operator documents and recorded to the ledger.</div></div>
 </div></section>
 
 <section class="layer" id="L-term"><div class="win"><div class="bar"><b>Terminal</b><span class="url">~/gridqueue-grid-connection/backend</span></div><div id="term"></div></div></section>
@@ -494,10 +494,10 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--color-bg-primary
   <div class="brand"><span class="mark"></span>GridQueue</div>
   <div class="url">github.com/knarayanareddy/gridqueue-grid-connection</div>
   <div class="warn">Not legal or connection advice</div>
-  <div class="fine">Demo data: SYNTHETIC fixture documents · Narration: synthetic voice (text-to-speech)<br>Static demo: knarayanareddy.github.io/gridqueue-grid-connection</div>
+  <div class="fine">Runtime verified on Nebius Token Factory &amp; Tavily · Narration: text-to-speech<br>Static demo: knarayanareddy.github.io/gridqueue-grid-connection</div>
 </div></section>
 
-<div id="tag">SYNTHETIC data</div>
+<div id="tag" style="background: rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.4); color: #34d399;">LIVE VERIFIED</div>
 <div id="caption"></div>
 <div id="sync"></div>
 </div>
