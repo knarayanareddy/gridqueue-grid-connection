@@ -25,7 +25,7 @@ from app.stages.base import StageResult
 from app.stages.s2_retrieve import FIXTURE_DIR, load_fixture_index
 from app.tf.ledger import LedgerStatus, record_telemetry
 
-MAX_CHARS_PER_DOCUMENT = 40_000  # TODO_VERIFY(C-T02: size against Ultra's context window from the catalog)
+MAX_CHARS_PER_DOCUMENT = 4_000
 
 OPTION_KINDS = [
     "non_firm_connection",
@@ -120,7 +120,7 @@ Rules — follow all of them:
 7. options: only routes the document itself describes (non-firm connection, flex contract, congestion
    management, ...). route_quote is the document's own sentence describing how to apply. Do not invent routes.
 8. If the documents contain no statement for this direction, return {"claims": [], "options": []}.
-Return JSON matching the provided schema and nothing else."""
+Be concise. Minimize internal chain-of-thought and proceed directly to producing the JSON matching the schema."""
 
 
 def build_user_prompt(ctx: Any) -> str:
@@ -199,10 +199,8 @@ class LiveExtractor:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {"role": "user", "content": build_user_prompt(ctx)},
                 ],
-                response_format={
-                    "type": "json_schema",
-                    "json_schema": {"name": "gridqueue_extraction", "schema": EXTRACTION_SCHEMA},
-                },
+                response_format={"type": "json_object"},
+                max_tokens=8192,
             )
             usage = getattr(completion, "usage", None)
             choice = completion.choices[0]

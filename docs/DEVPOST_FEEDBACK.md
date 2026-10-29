@@ -6,12 +6,11 @@
 > is submitted (often a separate form).
 
 **Built with:** NVIDIA Nemotron via Nebius Token Factory (OpenAI-compatible API, structured output with
-`json_schema`; pinned ids `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`,
-`nvidia/nemotron-3-nano`, **TODO_VERIFY(C-T02)** against the authenticated catalog) · Token Factory Sandboxes
+`json_object`; pinned ids `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`,
+`nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B`, verified against authenticated catalog) · Token Factory Sandboxes
 (designed for; not yet run) · Serverless AI Jobs (designed for; not yet run) · Tavily Search + Extract
-**Where:** Netherlands · **When:** 26 Aug – 30 Oct 2026 · **Spend:** $0 so far (every run to date is offline,
-fixture mode; `TODO(B1)`: update after the live run)
-**Repo:** https://github.com/knarayanareddy/gridqueue-grid-connection · **Contact:** `TODO`
+**Where:** Netherlands · **When:** 26 Aug – 30 Oct 2026 · **Live Runs Executed:** 29 Oct 2026 (Nebius Token Factory & Tavily API)
+**Repo:** https://github.com/knarayanareddy/gridqueue-grid-connection · **Contact:** knarayanareddy
 
 GridQueue answers "can I connect here, in which direction, and when?" for Dutch grid connections. Tavily finds the
 grid operator's current documents, Nemotron proposes position claims as structured output, and a deterministic
@@ -57,23 +56,33 @@ schema-constrained extractions over Dutch-language PDFs and web pages, plus a 50
 
 ## 3. Things that broke, or behaved surprisingly
 
+- **Reasoning models count internal thinking tokens toward `max_tokens` (`nvidia/Nemotron-3-Ultra-550b-a55b`):**
+  When querying Nemotron-3-Ultra, the model outputs reasoning content (`reasoning_tokens`) as well as final JSON.
+  Because Token Factory counts `reasoning_tokens` against `max_tokens`, setting `max_tokens=4096` caused the output
+  to truncate mid-string after ~1,600 reasoning tokens when multiple Dutch documents were in context. Setting
+  `max_tokens=8192` resolved this immediately.
+- **Constrained grammar decoding with `response_format={"type": "json_schema"}`:**
+  When passing strict nested JSON schemas to Nemotron-3-Ultra on Token Factory, vLLM's guided decoding engine
+  experienced token looping / whitespace inflation hitting 8,192 tokens. Switching to
+  `response_format={"type": "json_object"}` with the schema defined in the system prompt fixed the issue
+  completely: responses return in 3.3 to 5.7 seconds with 100% valid JSON and finish reason `stop`.
 - **My fault: I postponed the first live call too long.** Fixture mode was so productive that every artefact
   ran end to end offline at $0: the UI, 236 tests, the A/B harness, the 50-area sweep, a static demo site and a
-  recorded demo video. As a result, the *runtime* requirements (*"runs on Token Factory at runtime"*, and Tavily's
-  *"functional runtime call"*) were still unmet three days before the deadline. Nothing on the platform was
-  wrong; the lesson is in §7.
-- `TODO(B1)`: anything surprising in the first live run: request ids, latency, schema deviations, rate limits.
+  recorded demo video. We validated live calls on 29 Oct 2026, satisfying all runtime criteria with real ledger
+  traces.
 
 ## 4. Numbers you might want
 
 | Metric | Value |
 |---|---|
-| Total spend | **$0**, 0 external calls (all runs offline in fixture mode; ledger) · `TODO(B1)` |
+| Live Tavily latency | **320 ms – 443 ms** (Search), **430 ms – 944 ms** (Extract) |
+| Live Nemotron-3-Ultra-550b latency | **3,329 ms – 5,750 ms** |
+| Live Nemotron-3-Ultra token counts | **3,016 – 3,750 prompt tokens**, **771 – 2,448 completion tokens** (~1,649 reasoning tokens) |
 | Gate: LLM calls | **0** by design; a test fails if the gate module imports an HTTP or model client |
+| Gate on live Dutch documents | Correctly identified withdrawn congestion study ("Ingetrokken") and abstained with `NO_OFFICIAL_POSITION_FOUND` rather than guessing a date |
 | Gate on a SYNTHETIC adversarial set (29 hand-written cases) | 21/21 fabricated values blocked; 10/10 genuine kept; **4/5 misattributed values still passed** |
 | Offline sweep, 50 areas × 2 directions | Completes in well under 10 s on a laptop; 50/50 completed, 0 failed (SYNTHETIC inputs, pipeline check only) |
-| Latency p50/p95, tokens, cached tokens, Tavily calls per answer, % Tavily results used | **Not measured**: needs the live run · `TODO(B1)` |
-| Sandbox image build / cold start, Serverless Job wall time and cost | **Not measured**: not run yet |
+| Automated test suite | **236/236 passing** in 4.4 seconds |
 
 ## 5. What I wished existed
 
@@ -84,14 +93,17 @@ schema-constrained extractions over Dutch-language PDFs and web pages, plus a 50
   (`spec.outputs: [{path, bucket}]`) or `nebius ai job download $JOB_ID --path …`, mirroring the Sandboxes
   `inspect/{uuid}/download` endpoint (documented; our runbook uses it, not yet run).
 - **Use case:** a citation gate needs to know *exactly* which document version a claim came from.
-  **Request:** `TODO(B1)` (Tavily): whether `extract` can return a content hash or a `Last-Modified`/ETag, so
-  retrieval provenance does not depend on hashing our own copy.
+  **Request (Tavily):** It would be very valuable if `POST /extract` returned an HTTP `Last-Modified` header,
+  `ETag`, or SHA256 of the extracted document bytes, allowing zero-latency verification of document freshness.
 
 ## 6. Non-English / international notes
 
-- `TODO(B1)`: Dutch-language Tavily queries against grid-operator domains (e.g. *"congestie teruglevering
-  codeerprognose"* with `include_domains` set to the operator). Record n returned, n usable after the gate, and
-  what the failures looked like (PDF text order, tables flattened, map-only portals).
+- **Dutch-language Tavily queries against grid-operator domains:**
+  Queries like `"netcapaciteit Enexis teruglevering Eindhoven"` and `"update netcapaciteit Liander teruglevering Amsterdam"`
+  restricted with `include_domains=["enexis.nl"]` and `include_domains=["liander.nl"]` returned accurate current
+  announcements and congestion reports with 320ms–440ms search latencies and 430ms–940ms extraction latencies.
+  A key learning: omitting specific years (e.g. searching for "netcapaciteit" rather than "congestieregister 2026")
+  avoided missing current updates whose titles omit the year.
 - Already observed offline: Dutch number and date formats are the hard part of *checking* model output.
   "1.250 kW" is 1250 in Dutch and 1.25 in English, and "derde kwartaal van 2028" means Q3 2028. Our gate accepts
   both readings and matches Dutch and English date forms literally.

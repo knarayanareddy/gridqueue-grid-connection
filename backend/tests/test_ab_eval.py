@@ -188,9 +188,21 @@ def test_ab_results_endpoint(tmp_path):
 
 def test_api_has_no_way_to_turn_the_gate_off():
     assert set(AnswerRequest.model_fields) == {"postcode", "power_kw", "direction"}
-    client = TestClient(app)
-    body = client.post(
-        "/v1/answer", json={"postcode": "1012", "power_kw": 60, "direction": "feed_in", "verify": False, "gate": "off"}
-    ).json()
-    assert body["answer"]["per_direction"][0]["indicative_earliest_date"] is None  # the invented 2027-Q2 is dropped
-    assert body["answer"]["gate"]["checks_run"] > 0
+    from app.main import service_factory
+    from app.stages.s3_extract import ReplayExtractor
+    from app.pipeline import Services
+
+    app.dependency_overrides[service_factory] = lambda: (
+        Services(mode="fixture", tavily=None, extractor=ReplayExtractor()),
+        "test_run",
+        get_settings(),
+    )
+    try:
+        client = TestClient(app)
+        body = client.post(
+            "/v1/answer", json={"postcode": "1012", "power_kw": 60, "direction": "feed_in", "verify": False, "gate": "off"}
+        ).json()
+        assert body["answer"]["per_direction"][0]["indicative_earliest_date"] is None  # the invented 2027-Q2 is dropped
+        assert body["answer"]["gate"]["checks_run"] > 0
+    finally:
+        app.dependency_overrides.clear()

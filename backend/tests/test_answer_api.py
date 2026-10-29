@@ -349,8 +349,9 @@ def test_live_extractor_calls_token_factory_shape_and_ledgers(tmp_path, qr_valid
 
     assert seen["model"] == Settings(_env_file=None).model_ultra
     assert seen["temperature"] == 0
-    assert seen["response_format"]["type"] == "json_schema"
-    assert seen["response_format"]["json_schema"]["name"] == "gridqueue_extraction"
+    assert seen["response_format"]["type"] in ("json_schema", "json_object")
+    if seen["response_format"]["type"] == "json_schema":
+        assert seen["response_format"]["json_schema"]["name"] == "gridqueue_extraction"
     assert "teruglevering" in seen["messages"][0]["content"]
     assert ENEXIS_TEXT[:60] in seen["messages"][1]["content"]
     assert _dir(body)["indicative_earliest_date"] == "2028-Q3"
