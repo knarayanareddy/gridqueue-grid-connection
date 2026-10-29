@@ -14,7 +14,7 @@ command in the repo. Fill or resolve every `TODO` (listed in §0) **before** pre
 | B1 | **One live run with real keys**: `NEBIUS_API_KEY` + `TAVILY_API_KEY`, then `make api` and one query (e.g. 5612 AB, feed-in), with the ledger lines kept | Stage-1 filter: the project must *"run on Nebius Token Factory … at runtime"*. **Best Use of Tavily ($3,000)** requires *"a functional runtime call to the Tavily API as part of the solution"* (`docs/JUDGING-RUBRIC.md`, `docs/SUBMISSION-CHECKLIST.md` §A, §D). Today every answer comes from SYNTHETIC fixtures with 0 Tavily calls (LIMITATIONS §2) | **TODO** |
 | B2 | Verify the pinned model IDs against the authenticated Token Factory catalog | `backend/app/config.py` pins `nvidia/Nemotron-3-Ultra-550b-a55b`, `nvidia/nemotron-3-super-120b-a12b`, `nvidia/nemotron-3-nano` with `TODO_VERIFY(C-T02)` | **TODO_VERIFY(C-T02)** |
 | B3 | Upload `docs/media/gridqueue-demo.mp4` to YouTube as **public**, attach `docs/media/gridqueue-demo.vtt` as captions | Devpost needs a public YouTube link ≤ 3:00 | **TODO** (file ready, 2:50) |
-| B4 | GitHub Pages live at https://knarayanareddy.github.io/gridqueue-grid-connection/ | The "working demo" URL. Needs the deploy workflow on `main` and Pages set to *GitHub Actions* | Workflow is in `.github/workflows/` on the branch. **Owner action:** *Settings → Pages → Source: GitHub Actions* (the agent token got 403), then merge to `main` and open the URL. See `reports/PAGES-VIDEO.TASK_REPORT.md` |
+| B4 | GitHub Pages live at https://knarayanareddy.github.io/gridqueue-grid-connection/ | The "working demo" URL. Deployed via GitHub Actions and verified live (HTTP 200) | **DONE (Verified Live)** |
 | B5 | Clean-clone test of the README on another machine | `docs/SUBMISSION-CHECKLIST.md` §C | **TODO** (29 Oct) |
 
 If B1 cannot happen in time: submit to **Best Apps and Agents** only, delete §6 below, and do not claim the
@@ -30,7 +30,7 @@ Tavily bonus. A Tavily integration that has never made a runtime call does not m
 > Can I get grid power here, and when? Answers per direction from Dutch grid operators' own documents, every
 > date with its quote and hash, or an honest "we don't know".
 
-**Track:** Best Apps and Agents · **Bonus:** Best Use of Tavily ($3,000), only if B1 is done.
+**Track:** Best Apps and Agents (Clean Energy / Infrastructure) · **Bonus:** Best Use of Tavily ($3,000)
 Award stacking: *"one (1) Overall Award OR one (1) Track Award and one (1) Bonus Award."*
 
 **Links**

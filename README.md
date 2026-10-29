@@ -1,5 +1,8 @@
 # GridQueue — Energy Grid Interconnection Navigator & Flex Planner
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-GitHub_Pages-2ea44f?style=for-the-badge)](https://knarayanareddy.github.io/gridqueue-grid-connection/)
+[![Submission Status](https://img.shields.io/badge/Submission-READY-success?style=for-the-badge)](docs/DEVPOST_SUBMISSION.md)
+
 > **Can I actually get power here, and when? GridQueue answers per direction (feed-in vs consumption) from
 > official Dutch grid-operator documents, refuses to invent a date, and ranks the non-firm and flexibility
 > routes you can use today.**
